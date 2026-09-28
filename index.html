@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bambu Lab Presets</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #00ae42;
+            --text-color: #ffffff;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin: 10px 0 20px 0;
+            font-weight: 700;
+        }
+
+        .controls {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 14px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #2a2a2a;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+        }
+
+        select:focus {
+            border-color: var(--accent);
+        }
+
+        .results-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent);
+        }
+
+        .card h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2a2a;
+            font-size: 0.95rem;
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            color: var(--text-muted);
+        }
+
+        .setting-value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .tip-box {
+            background-color: #1a2e22;
+            border: 1px solid #285435;
+            padding: 14px;
+            margin-top: 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .tip-box strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bambu Slicer Presets</h1>
+    
+    <div class="controls">
+        <div class="form-group">
+            <label for="printer">Drucker Modell</label>
+            <select id="printer" onchange="updateSettings()">
+                <option value="P1P">Bambu Lab P1P (Offen)</option>
+                <option value="P1S" selected>Bambu Lab P1S (Geschlossen)</option>
+                <option value="H2D">Bambu Lab H2D Series</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="material">Filament Material</label>
+            <select id="material" onchange="updateSettings()">
+                <option value="PLA" selected>PLA / PLA+</option>
+                <option value="PETG">PETG</option>
+                <option value="ABS">ABS</option>
+                <option value="ASA">ASA</option>
+                <option value="TPU">TPU (Flexibel)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="purpose">Anwendungszweck</label>
+            <select id="purpose" onchange="updateSettings()">
+                <option value="standard" selected>Standard / Deko</option>
+                <option value="functional">Funktionsteil (Stark)</option>
+                <option value="detail">Fein / Optik</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="results-grid">
+        <div class="card">
+            <h3>Temperatur & Kühlung</h3>
+            <div class="setting-row"><span class="setting-label">Düse:</span><span class="setting-value" id="nozzleTemp">-</span></div>
+            <div class="setting-row"><span class="setting-label">Druckbett:</span><span class="setting-value" id="bedTemp">-</span></div>
+            <div class="setting-row"><span class="setting-label">Bauteillüfter:</span><span class="setting-value" id="fanSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Gehäuse:</span><span class="setting-value" id="chamberTip">-</span></div>
+        </div>
+
+        <div class="card">
+            <h3>Wände & Oberflächen</h3>
+            <div class="setting-row"><span class="setting-label">Wandlinien:</span><span class="setting-value" id="wallLoops">-</span></div>
+            <div class="setting-row"><span class="setting-label">Top Schichten:</span><span class="setting-value" id="topLayers">-</span></div>
+            <div class="setting-row"><span class="setting-label">Bottom Schichten:</span><span class="setting-value" id="bottomLayers">-</span></div>
+            <div class="setting-row"><span class="setting-label">Infill %:</span><span class="setting-value" id="infillDensity">-</span></div>
+            <div class="setting-row"><span class="setting-label">Füllmuster:</span><span class="setting-value" id="infillPattern">-</span></div>
+            <div class="setting-row"><span class="setting-label">Bügeln:</span><span class="setting-value" id="ironing">-</span></div>
+        </div>
+
+        <div class="card">
+            <h3>Geschwindigkeit</h3>
+            <div class="setting-row"><span class="setting-label">Außenwand:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Innenwand:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Top Surface:</span><span class="setting-value" id="topSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Schichthöhe:</span><span class="setting-value" id="layerHeight">-</span></div>
+            <div class="setting-row"><span class="setting-label">Flow Ratio:</span><span class="setting-value" id="flowRatio">-</span></div>
+        </div>
+    </div>
+
+    <div class="tip-box">
+        <strong>Tipp für das Material:</strong>
+        <span id="materialNotes">-</span>
+    </div>
+</div>
+
+<script>
+const database = {
+    PLA: { nozzle: "215°C - 220°C", bed: "55°C - 60°C", fan: "100%", flow: "0.98", notes: "Gute Haftung auf PEI. Bei P1S/H2D Tür spaltbreit offen lassen wegen Heat Creep." },
+    PETG: { nozzle: "240°C - 255°C", bed: "70°C - 80°C", fan: "40% - 60%", flow: "0.95", notes: "Langsamer drucken als PLA für perfekte Layerhaftung. Filament gut trocknen!" },
+    ABS: { nozzle: "250°C - 265°C", bed: "90°C - 100°C", fan: "0% - 20%", flow: "0.95", notes: "Geschlossener Bauraum Pflicht! 15 Min. vorheizen, Lüfter minimal halten gegen Warping." },
+    ASA: { nozzle: "255°C - 270°C", bed: "95°C - 105°C", fan: "0% - 25%", flow: "0.95", notes: "UV-beständig. Geschlossenes Gehäuse Pflicht! Nach Druck langsam abkühlen lassen." },
+    TPU: { nozzle: "220°C - 235°C", bed: "35°C - 45°C", fan: "80% - 100%", flow: "1.00", notes: "Nicht über AMS nutzen! Direkt vom externen Halter zuführen und sehr langsam drucken (max. 30-50 mm/s)." }
+};
+
+function updateSettings() {
+    const printer = document.getElementById("printer").value;
+    const material = document.getElementById("material").value;
+    const purpose = document.getElementById("purpose").value;
+    const matData = database[material];
+
+    document.getElementById("nozzleTemp").innerText = matData.nozzle;
+    document.getElementById("bedTemp").innerText = matData.bed;
+    document.getElementById("fanSpeed").innerText = matData.fan;
+    document.getElementById("flowRatio").innerText = matData.flow;
+    document.getElementById("materialNotes").innerText = matData.notes;
+
+    if (material === "ABS" || material === "ASA") {
+        document.getElementById("chamberTip").innerText = printer === "P1P" ? "Gehäuse nachrüsten!" : "Geschlossen (Vorheizen)";
+    } else if (material === "PLA") {
+        document.getElementById("chamberTip").innerText = printer === "P1P" ? "Offen" : "Tür/Deckel ankippen";
+    } else {
+        document.getElementById("chamberTip").innerText = "Geschlossen";
+    }
+
+    if (purpose === "standard") {
+        document.getElementById("wallLoops").innerText = "2 - 3";
+        document.getElementById("topLayers").innerText = "4 - 5";
+        document.getElementById("bottomLayers").innerText = "3 - 4";
+        document.getElementById("infillDensity").innerText = "15% - 20%";
+        document.getElementById("infillPattern").innerText = "Gyroid / Cross Hatch";
+        document.getElementById("ironing").innerText = "Aus / Top Layer";
+        document.getElementById("layerHeight").innerText = "0.20 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "200 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "40 mm/s" : "300 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
+    } else if (purpose === "functional") {
+        document.getElementById("wallLoops").innerText = "4 - 6";
+        document.getElementById("topLayers").innerText = "5 - 6";
+        document.getElementById("bottomLayers").innerText = "4 - 5";
+        document.getElementById("infillDensity").innerText = "30% - 50%";
+        document.getElementById("infillPattern").innerText = "Gyroid / Cubic";
+        document.getElementById("ironing").innerText = "Aus";
+        document.getElementById("layerHeight").innerText = "0.20 - 0.24 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "25 mm/s" : "120 - 150 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "200 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "25 mm/s" : "100 mm/s";
+    } else if (purpose === "detail") {
+        document.getElementById("wallLoops").innerText = "3";
+        document.getElementById("topLayers").innerText = "6";
+        document.getElementById("bottomLayers").innerText = "5";
+        document.getElementById("infillDensity").innerText = "15%";
+        document.getElementById("infillPattern").innerText = "Gyroid";
+        document.getElementById("ironing").innerText = "An (Top Surfaces)";
+        document.getElementById("layerHeight").innerText = "0.12 - 0.16 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "20 mm/s" : "80 - 100 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "20 mm/s" : "80 mm/s";
+    }
+}
+
+updateSettings();
+</script>
+
+</body>
+</html>
+
