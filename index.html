@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bambu Slicer Pro Tool - Presets & Support Matrix</title>
+    <title>Bambu Slicer Master Tool - Presets, Holo Plates & High-Flow</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -11,6 +11,8 @@
             --accent: #00ae42;
             --accent-warn: #e67e22;
             --accent-blue: #3498db;
+            --accent-purple: #9b59b6;
+            --accent-holo: #e056fd;
             --text-color: #ffffff;
             --text-muted: #a0a0a0;
             --border-color: #333333;
@@ -124,6 +126,10 @@
             border-left-color: var(--accent-blue);
         }
 
+        .card.firstlayer-card {
+            border-left-color: var(--accent-holo);
+        }
+
         .card h3 {
             margin: 0 0 10px 0;
             font-size: 1.05rem;
@@ -132,6 +138,10 @@
 
         .card.support-card h3 {
             color: var(--accent-blue);
+        }
+
+        .card.firstlayer-card h3 {
+            color: var(--accent-holo);
         }
 
         .setting-row {
@@ -172,6 +182,22 @@
             margin-bottom: 4px;
         }
 
+        .material-guide {
+            background-color: #1d232a;
+            border: 1px solid #334155;
+            padding: 14px;
+            margin-top: 16px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .material-guide strong {
+            color: #38bdf8;
+            display: block;
+            margin-bottom: 6px;
+        }
+
         .hardware-alert {
             background-color: #3d2412;
             border: 1px solid #854316;
@@ -187,7 +213,7 @@
 <body>
 
 <div class="container">
-    <h1>Bambu Slicer Pro Tool</h1>
+    <h1>Bambu Slicer Master Tool</h1>
 
     <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
         <strong>📁 STL / 3MF / STEP Datei importieren</strong>
@@ -204,6 +230,25 @@
                 <option value="H2D" selected>Bambu Lab H2D Series (Dual Nozzle)</option>
                 <option value="P1S">Bambu Lab P1S (AMS Single-Nozzle)</option>
                 <option value="P1P">Bambu Lab P1P (Offen)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="nozzleType">Nozzle / Düsen-Typ</label>
+            <select id="nozzleType" onchange="updateSettings()">
+                <option value="standard_04">Standard Stainless / Hardened Steel (0.4 mm)</option>
+                <option value="highflow_04" selected>High-Flow Nozzle (0.4 mm - CHT / ObXidian / E3D)</option>
+                <option value="highflow_06">High-Flow Nozzle (0.6 mm - High Speed)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="buildPlate">Druckplatte (Build Plate)</label>
+            <select id="buildPlate" onchange="updateSettings()">
+                <option value="holo" selected>Holo / PEO / PED / PET (Hologramm / Muster)</option>
+                <option value="smooth_pei">Smooth PEI / Smooth High Temp Plate</option>
+                <option value="textured_pei">Textured PEI Plate (Muster-Textur)</option>
+                <option value="cool_plate">Bambu Cool Plate / Engineering Plate</option>
             </select>
         </div>
 
@@ -257,6 +302,17 @@
     </div>
 
     <div class="results-grid">
+        <!-- Druckplatten & Erste Schicht Card -->
+        <div class="card firstlayer-card">
+            <h3>Druckplatte & 1. Schicht Optimierung</h3>
+            <div class="setting-row"><span class="setting-label">Platten-Typ:</span><span class="setting-value" id="plateDisplay">Holo / PEO</span></div>
+            <div class="setting-row"><span class="setting-label">First Layer Line Width:</span><span class="setting-value" id="flLineWidth">0.52 mm</span></div>
+            <div class="setting-row"><span class="setting-label">First Layer Speed:</span><span class="setting-value" id="flSpeed">30 mm/s</span></div>
+            <div class="setting-row"><span class="setting-label">First Layer Flow Ratio:</span><span class="setting-value" id="flFlow">1.05 (+5% Druck)</span></div>
+            <div class="setting-row"><span class="setting-label">Elefantenfuß-Kompensation:</span><span class="setting-value" id="eleFootComp">0.10 mm</span></div>
+            <div class="setting-row"><span class="setting-label">Bett-Temperatur (1. Layer):</span><span class="setting-value" id="flBedTemp">65°C</span></div>
+        </div>
+
         <!-- Professional Support Card -->
         <div class="card support-card">
             <h3>Support & Trennschicht (Pro Settings)</h3>
@@ -272,12 +328,12 @@
         </div>
 
         <div class="card">
-            <h3>Temperatur & Kühlung</h3>
-            <div class="setting-row"><span class="setting-label">Düse (Nozzle Haupt):</span><span class="setting-value" id="nozzleTemp">-</span></div>
-            <div class="setting-row"><span class="setting-label">Druckbett:</span><span class="setting-value" id="bedTemp">-</span></div>
+            <h3>Temperatur & Flow-Limits (Nozzle tuned)</h3>
+            <div class="setting-row"><span class="setting-label">Düse (Nozzle Temp):</span><span class="setting-value" id="nozzleTemp">-</span></div>
+            <div class="setting-row"><span class="setting-label">Druckbett (Standard):</span><span class="setting-value" id="bedTemp">-</span></div>
+            <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
             <div class="setting-row"><span class="setting-label">Bauteillüfter:</span><span class="setting-value" id="fanSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Gehäuse:</span><span class="setting-value" id="chamberTip">-</span></div>
-            <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
         </div>
 
         <div class="card">
@@ -291,41 +347,46 @@
         </div>
 
         <div class="card">
-            <h3>Geschwindigkeit & Naht</h3>
+            <h3>Geschwindigkeit & High-Flow Speeds</h3>
             <div class="setting-row"><span class="setting-label">Außenwand Speed:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Innenwand Speed:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Infill Speed:</span><span class="setting-value" id="infillSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Top Surface Speed:</span><span class="setting-value" id="topSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Schichthöhe:</span><span class="setting-value" id="layerHeight">-</span></div>
-            <div class="setting-row"><span class="setting-label">Flow Ratio:</span><span class="setting-value" id="flowRatio">-</span></div>
+            <div class="setting-row"><span class="setting-label">Flow Ratio (Main):</span><span class="setting-value" id="flowRatio">-</span></div>
             <div class="setting-row"><span class="setting-label">Naht-Ausrichtung:</span><span class="setting-value" id="seamPos">-</span></div>
         </div>
     </div>
 
     <div class="tip-box">
-        <strong>Expertentipp für Support & Geometrie:</strong>
+        <strong>Expertentipp für Support, Platten & High-Flow:</strong>
         <span id="geometryNote">-</span>
+    </div>
+
+    <div class="material-guide">
+        <strong>Material-Guide & Einsatzbereiche:</strong>
+        <span id="materialComparisonNote">-</span>
     </div>
 </div>
 
 <script>
 const matDatabase = {
-    "PLA":      { nozzle: [210, 220], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "21 mm³/s", defaultZ: "0.20 mm", hardNozzle: false },
-    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "18 mm³/s", defaultZ: "0.20 mm", hardNozzle: true },
-    "PETG":     { nozzle: [235, 250], bed: [70, 80],  fan: "40-60%", flow: 0.95, vol: "13 mm³/s", defaultZ: "0.24 mm", hardNozzle: false },
-    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  fan: "30-50%", flow: 0.95, vol: "12 mm³/s", defaultZ: "0.24 mm", hardNozzle: true },
-    "ABS":      { nozzle: [245, 265], bed: [90, 100], fan: "0-20%", flow: 0.95, vol: "16 mm³/s", defaultZ: "0.20 mm", hardNozzle: false },
-    "ASA":      { nozzle: [250, 270], bed: [95, 105], fan: "0-25%", flow: 0.95, vol: "15 mm³/s", defaultZ: "0.20 mm", hardNozzle: false },
-    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], fan: "0-20%", flow: 0.95, vol: "14 mm³/s", defaultZ: "0.22 mm", hardNozzle: true },
-    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], fan: "0-10%", flow: 0.96, vol: "10 mm³/s", defaultZ: "0.25 mm", hardNozzle: true },
-    "TPU":      { nozzle: [220, 235], bed: [30, 45],  fan: "80-100%", flow: 1.00, vol: "3.5 mm³/s", defaultZ: "0.20 mm", hardNozzle: false }
+    "PLA":      { nozzle: [210, 220], bed: [55, 65],  fan: "100%", flow: 0.98, vol: 21, defaultZ: "0.20 mm", hardNozzle: false, guide: "PLA: Sehr leicht zu drucken, extrem steif, perfekte Optik. Ideal für Holo-Platten und Figuren." },
+    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  fan: "100%", flow: 0.98, vol: 18, defaultZ: "0.20 mm", hardNozzle: true,  guide: "PLA-CF: Karbonverstärkt, extrem mattes Finish, kaschiert Schichtlinien perfekt." },
+    "PETG":     { nozzle: [235, 250], bed: [70, 80],  fan: "40-60%", flow: 0.95, vol: 13, defaultZ: "0.24 mm", hardNozzle: false, guide: "PETG: Zäh, schlagfest und witterungsbeständig (~75°C). Benötigt sauberen Flow gegen Stringing." },
+    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  fan: "30-50%", flow: 0.95, vol: 12, defaultZ: "0.24 mm", hardNozzle: true,  guide: "PETG-CF: Hohe mechanische Belastbarkeit & Hitzeformbeständigkeit. Mattschwarze Profi-Optik." },
+    "ABS":      { nozzle: [245, 265], bed: [90, 100], fan: "0-20%", flow: 0.95, vol: 16, defaultZ: "0.20 mm", hardNozzle: false, guide: "ABS: Hitzebeständig bis ~95°C. Benötigt geschlossenes Gehäuse gegen Warping." },
+    "ASA":      { nozzle: [250, 270], bed: [95, 105], fan: "0-25%", flow: 0.95, vol: 15, defaultZ: "0.20 mm", hardNozzle: false, guide: "ASA: Wie ABS, aber UV- und witterungsbeständig. Ideal für Außeneinsatz & Fahrzeuge." },
+    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], fan: "0-20%", flow: 0.95, vol: 14, defaultZ: "0.22 mm", hardNozzle: true,  guide: "ASA-GF: Glasfaserverstärktes ASA. Extrem verzugsarm & verwindungssteif." },
+    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], fan: "0-10%", flow: 0.96, vol: 10, defaultZ: "0.25 mm", hardNozzle: true,  guide: "PA-CF: High-End Nylon Carbon. Höchste Festigkeit & Temperaturbeständigkeit (>120°C)." },
+    "TPU":      { nozzle: [220, 235], bed: [30, 45],  fan: "80-100%", flow: 1.00, vol: 3.5, defaultZ: "0.20 mm", hardNozzle: false, guide: "TPU: Gummiartig & flexibel. Muss langsam gedruckt werden." }
 };
 
 const brandOffsets = {
-    "bambu":    { tempAdd: 0,  flowMult: 1.00, note: "Bambu Original: Optimal kalibriert." },
-    "sunlu":    { tempAdd: -5, flowMult: 0.98, note: "Sunlu: Leicht reduzierter Flow für sauberere Oberflächen." },
-    "esun":     { tempAdd: 5,  flowMult: 0.99, note: "eSUN: +5°C Höhere Temperatur für maximale Festigkeit." },
-    "geeetech": { tempAdd: 0,  flowMult: 0.97, note: "Geeetech: Geringerer Fluss reduziert Fädenbildung." },
-    "tinmorry": { tempAdd: 0,  flowMult: 0.98, note: "Tinmorry: Gleichmäßige Schichten." }
+    "bambu":    { tempAdd: 0,  flowMult: 1.00, note: "Bambu Original: Optimal abgestimmt." },
+    "sunlu":    { tempAdd: -5, flowMult: 0.98, note: "Sunlu: Leicht reduzierter Flow für saubere Flächen." },
+    "esun":     { tempAdd: 5,  flowMult: 0.99, note: "eSUN: +5°C Temperatur für maximale Schichtverbindung." },
+    "geeetech": { tempAdd: 0,  flowMult: 0.97, note: "Geeetech: Geringerer Fluss verhindert Fädenbildung." },
+    "tinmorry": { tempAdd: 0,  flowMult: 0.98, note: "Tinmorry: Sehr präzise Schichtdicken." }
 };
 
 function handleFileSelect(evt) {
@@ -356,6 +417,8 @@ function handleFileSelect(evt) {
 
 function updateSettings() {
     const printer = document.getElementById("printer").value;
+    const nozzleType = document.getElementById("nozzleType").value;
+    const buildPlate = document.getElementById("buildPlate").value;
     const brand = document.getElementById("brand").value;
     const material = document.getElementById("material").value;
     const suppMat = document.getElementById("supportMaterial").value;
@@ -364,19 +427,36 @@ function updateSettings() {
     const mat = matDatabase[material];
     const br = brandOffsets[brand];
 
-    const minNozz = mat.nozzle[0] + br.tempAdd;
-    const maxNozz = mat.nozzle[1] + br.tempAdd;
+    // High-Flow & Nozzle Berechnungen
+    let flowVolBoost = 1.0;
+    let tempNozzleAdd = 0;
+    let speedMult = 1.0;
+
+    if (nozzleType === "highflow_04") {
+        flowVolBoost = 1.50; // +50% Volumenfluss bei High-Flow CHT/ObXidian
+        tempNozzleAdd = 5;    // +5°C um Durchfluss flüssig zu halten
+        speedMult = 1.35;
+    } else if (nozzleType === "highflow_06") {
+        flowVolBoost = 1.90; // +90% Volumenfluss bei 0.6mm High-Flow
+        tempNozzleAdd = 8;
+        speedMult = 1.50;
+    }
+
+    const calcVolumetric = (mat.vol * flowVolBoost).toFixed(1);
+    const minNozz = mat.nozzle[0] + br.tempAdd + tempNozzleAdd;
+    const maxNozz = mat.nozzle[1] + br.tempAdd + tempNozzleAdd;
     const calcFlow = (mat.flow * br.flowMult).toFixed(2);
 
     document.getElementById("nozzleTemp").innerText = minNozz + "°C - " + maxNozz + "°C";
     document.getElementById("bedTemp").innerText = mat.bed[0] + "°C - " + mat.bed[1] + "°C";
     document.getElementById("fanSpeed").innerText = mat.fan;
     document.getElementById("flowRatio").innerText = calcFlow;
-    document.getElementById("maxVolumetric").innerText = mat.vol;
+    document.getElementById("maxVolumetric").innerText = calcVolumetric + " mm³/s (" + (nozzleType.includes("highflow") ? "High-Flow Boost" : "Standard") + ")";
+    document.getElementById("materialComparisonNote").innerText = mat.guide;
 
     // Hardware Alert
     const hwAlert = document.getElementById("hardwareAlert");
-    if (mat.hardNozzle) {
+    if (mat.hardNozzle && nozzleType === "standard_04") {
         hwAlert.style.display = "block";
         hwAlert.innerHTML = "⚠️ <strong>Achtung:</strong> Für " + material + " benötigst du eine <strong>gehärtete Düse (Hardened Steel)</strong>!";
     } else {
@@ -392,7 +472,47 @@ function updateSettings() {
         document.getElementById("chamberTip").innerText = "Geschlossen";
     }
 
-    // SUPPORT LOGIK (PROFESSIONAL MATRIX)
+    // DRUCKPLATTEN & 1. SCHICHT OPTIMIERUNG
+    let bedTempFinal = mat.bed[0];
+    let flWidth = "0.50 mm";
+    let flFlowCalc = (calcFlow * 1.03).toFixed(2);
+    let eleComp = "0.15 mm";
+    let plateName = "Smooth PEI";
+
+    if (buildPlate === "holo") {
+        plateName = "Holo / PEO / PED (Effekt-Platte)";
+        bedTempFinal = mat.bed[0] + 5; // Erhöht die Haftung für den Mikrostruktur-Transfer
+        flWidth = "0.52 mm (Presst voll in die Hologramm-Struktur)";
+        flFlowCalc = (calcFlow * 1.05).toFixed(2) + " (+5% Extra-Druck für Spiegeleffekt)";
+        eleComp = "0.08 mm (Minimiert Wulst für flachen Effekt)";
+    } else if (buildPlate === "textured_pei") {
+        plateName = "Textured PEI (Rau)";
+        bedTempFinal = mat.bed[0] + 5;
+        flWidth = "0.50 mm";
+        flFlowCalc = (calcFlow * 1.04).toFixed(2);
+        eleComp = "0.15 mm";
+    } else if (buildPlate === "cool_plate") {
+        plateName = "Cool Plate (Bambu)";
+        bedTempFinal = 35;
+        flWidth = "0.45 mm";
+        flFlowCalc = calcFlow;
+        eleComp = "0.15 mm";
+    } else {
+        plateName = "Smooth PEI / High Temp";
+        bedTempFinal = mat.bed[0];
+        flWidth = "0.50 mm";
+        flFlowCalc = (calcFlow * 1.03).toFixed(2);
+        eleComp = "0.15 mm";
+    }
+
+    document.getElementById("plateDisplay").innerText = plateName;
+    document.getElementById("flLineWidth").innerText = flWidth;
+    document.getElementById("flSpeed").innerText = material === "TPU" ? "20 mm/s" : "30 mm/s (Langsam für Haftung)";
+    document.getElementById("flFlow").innerText = flFlowCalc;
+    document.getElementById("eleFootComp").innerText = eleComp;
+    document.getElementById("flBedTemp").innerText = bedTempFinal + "°C";
+
+    // SUPPORT LOGIK
     let zDist = mat.defaultZ;
     let bZDist = mat.defaultZ;
     let interLayers = "3 Schichten";
@@ -408,7 +528,6 @@ function updateSettings() {
     }
 
     if (suppMat !== "same") {
-        // Trennschicht-Material aktiviert
         zDist = "0.00 mm (Perfekte Unterseite!)";
         bZDist = "0.00 mm";
         interLayers = "3 - 4 Schichten";
@@ -416,7 +535,6 @@ function updateSettings() {
         interSpacing = "0.00 mm (Vollflächig)";
         suppNote = "Spezial-Support / Trennschicht aktiv! Dank 0.00mm Z-Abstand wird die Unterseite spiegelglatt. ";
     } else {
-        // Monomaterial Support
         zDist = mat.defaultZ;
         bZDist = mat.defaultZ;
         interLayers = "2 Schichten";
@@ -433,7 +551,12 @@ function updateSettings() {
     document.getElementById("supportExtruder").innerText = suppMat === "same" ? "T1 (Haupt-Düse)" : extText;
     document.getElementById("supportXYDistance").innerText = purpose === "detail" ? "0.40 mm" : "0.35 mm";
 
-    // Zweck & Geometrie-Logik
+    // ZWECK, GEOMETRIE & HIGH-FLOW GESCHWINDIGKEITEN
+    let baseOuter = 120;
+    let baseInner = 200;
+    let baseInfill = 270;
+    let baseTop = 100;
+
     if (purpose === "functional") {
         document.getElementById("wallLoops").innerText = "4 - 5 Linear";
         document.getElementById("wallOrder").innerText = "Inner / Outer / Inner";
@@ -442,11 +565,8 @@ function updateSettings() {
         document.getElementById("infillPattern").innerText = "Wabenmuster / Hexagon";
         document.getElementById("ironing").innerText = "Aus";
         document.getElementById("layerHeight").innerText = "0.20 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "25 mm/s" : "100 - 120 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "35 mm/s" : "200 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "25 mm/s" : "100 mm/s";
-        document.getElementById("seamPos").innerText = "Scharfe Ecke (Aligned)";
-        suppNote += "Wabenmuster für maximale Torsionssteifigkeit.";
+        baseOuter = 110; baseInner = 200; baseInfill = 250; baseTop = 100;
+        suppNote += "Wabenmuster für höchste Torsionssteifigkeit.";
     
     } else if (purpose === "detail") {
         document.getElementById("wallLoops").innerText = "3 Linien";
@@ -456,11 +576,8 @@ function updateSettings() {
         document.getElementById("infillPattern").innerText = "Gyroid (Vibrationsarm)";
         document.getElementById("ironing").innerText = "An (Top Surfaces)";
         document.getElementById("layerHeight").innerText = "0.08 - 0.12 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "20 mm/s" : "60 - 80 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "120 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "20 mm/s" : "60 mm/s";
-        document.getElementById("seamPos").innerText = "Verdeckt (Back)";
-        suppNote += "Gyroid verhindert Eigenresonanz und Ghosting. Tree-Support nutzen.";
+        baseOuter = 70; baseInner = 120; baseInfill = 180; baseTop = 60;
+        suppNote += "Gyroid verhindert Resonanzstreifen & Ghosting. Tree-Support nutzen.";
 
     } else if (purpose === "thinwall") {
         document.getElementById("wallLoops").innerText = "2 - 3 Linien";
@@ -470,11 +587,8 @@ function updateSettings() {
         document.getElementById("infillPattern").innerText = "Monotonic Line";
         document.getElementById("ironing").innerText = "Aus";
         document.getElementById("layerHeight").innerText = "0.16 - 0.20 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "25 mm/s" : "90 - 110 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "35 mm/s" : "150 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "25 mm/s" : "80 mm/s";
-        document.getElementById("seamPos").innerText = "Ecke";
-        suppNote += "Vollmaterial-Einstellung für Gehäuse ohne Schwingungsringe.";
+        baseOuter = 100; baseInner = 160; baseInfill = 220; baseTop = 80;
+        suppNote += "Vollmaterial-Einstellung für dünne Wände ohne Schwingungen.";
 
     } else {
         document.getElementById("wallLoops").innerText = "3 Linien";
@@ -484,13 +598,23 @@ function updateSettings() {
         document.getElementById("infillPattern").innerText = "Gyroid / Cross Hatch";
         document.getElementById("ironing").innerText = "Aus / Auf Wunsch";
         document.getElementById("layerHeight").innerText = "0.20 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "40 mm/s" : "250 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "30 mm/s" : "120 mm/s";
-        document.getElementById("seamPos").innerText = "Ausgerichtet";
+        baseOuter = 140; baseInner = 230; baseInfill = 300; baseTop = 110;
         suppNote += "Standard Allround-Preset.";
     }
 
+    if (material === "TPU") {
+        document.getElementById("outerWallSpeed").innerText = "25 mm/s";
+        document.getElementById("innerWallSpeed").innerText = "35 mm/s";
+        document.getElementById("infillSpeed").innerText = "45 mm/s";
+        document.getElementById("topSpeed").innerText = "25 mm/s";
+    } else {
+        document.getElementById("outerWallSpeed").innerText = Math.round(baseOuter * speedMult) + " mm/s";
+        document.getElementById("innerWallSpeed").innerText = Math.round(baseInner * speedMult) + " mm/s";
+        document.getElementById("infillSpeed").innerText = Math.round(baseInfill * speedMult) + " mm/s";
+        document.getElementById("topSpeed").innerText = Math.round(baseTop * speedMult) + " mm/s";
+    }
+
+    document.getElementById("seamPos").innerText = purpose === "detail" ? "Möglichst verdeckt (Back)" : "Scharfe Ecke (Aligned)";
     document.getElementById("geometryNote").innerText = suppNote;
 }
 
