@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bambu Lab Presets</title>
+    <title>Bambu Slicer Pro Presets</title>
     <style>
         :root {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --accent: #00ae42;
+            --accent-warn: #e67e22;
             --text-color: #ffffff;
             --text-muted: #a0a0a0;
             --border-color: #333333;
@@ -25,11 +26,11 @@
             color: var(--text-color);
             margin: 0;
             padding: 12px;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
         }
 
@@ -37,7 +38,7 @@
             text-align: center;
             color: var(--accent);
             font-size: 1.4rem;
-            margin: 10px 0 20px 0;
+            margin: 10px 0 15px 0;
             font-weight: 700;
         }
 
@@ -52,7 +53,7 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .form-group:last-child {
@@ -61,22 +62,25 @@
 
         label {
             font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        select {
-            padding: 12px;
+        select, input[type="file"] {
+            padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background-color: #2a2a2a;
             color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
             width: 100%;
             outline: none;
+        }
+
+        select {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
             background-repeat: no-repeat;
@@ -84,8 +88,22 @@
             background-size: 20px;
         }
 
-        select:focus {
-            border-color: var(--accent);
+        /* File Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            background: #18261c;
+            color: #fff;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .drop-zone p {
+            margin: 5px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .results-grid {
@@ -103,8 +121,8 @@
         }
 
         .card h3 {
-            margin: 0 0 12px 0;
-            font-size: 1.1rem;
+            margin: 0 0 10px 0;
+            font-size: 1.05rem;
             color: var(--accent);
         }
 
@@ -112,9 +130,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 7px 0;
             border-bottom: 1px solid #2a2a2a;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .setting-row:last-child {
@@ -136,7 +154,7 @@
             padding: 14px;
             margin-top: 16px;
             border-radius: 12px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             line-height: 1.4;
         }
 
@@ -145,12 +163,32 @@
             display: block;
             margin-bottom: 4px;
         }
+
+        .hardware-alert {
+            background-color: #3d2412;
+            border: 1px solid #854316;
+            color: #ffaa66;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Bambu Slicer Presets</h1>
+    <h1>Bambu Slicer Pro Presets</h1>
+
+    <!-- 3D Datei Analyse -->
+    <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+        <strong>📁 STL / 3MF / STEP Datei laden</strong>
+        <p id="fileNameDisplay">Datei hierher ziehen oder tippen zum Auswählen</p>
+        <input type="file" id="fileInput" accept=".stl,.3mf,.step" style="display:none" onchange="handleFileSelect(event)">
+    </div>
+
+    <div id="hardwareAlert" class="hardware-alert"></div>
     
     <div class="controls">
         <div class="form-group">
@@ -163,12 +201,27 @@
         </div>
 
         <div class="form-group">
-            <label for="material">Filament Material</label>
+            <label for="brand">Filament Marke</label>
+            <select id="brand" onchange="updateSettings()">
+                <option value="bambu" selected>Bambu Lab</option>
+                <option value="sunlu">Sunlu</option>
+                <option value="esun">eSUN</option>
+                <option value="geeetech">Geeetech</option>
+                <option value="tinmorry">Tinmorry</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="material">Filament Typ</label>
             <select id="material" onchange="updateSettings()">
                 <option value="PLA" selected>PLA / PLA+</option>
+                <option value="PLA-CF">PLA-CF (Carbon)</option>
                 <option value="PETG">PETG</option>
+                <option value="PETG-CF">PETG-CF (Carbon)</option>
                 <option value="ABS">ABS</option>
                 <option value="ASA">ASA</option>
+                <option value="ASA-GF">ASA-GF (Glasfaser)</option>
+                <option value="PA-CF">PA-CF / Nylon Carbon</option>
                 <option value="TPU">TPU (Flexibel)</option>
             </select>
         </div>
@@ -177,7 +230,7 @@
             <label for="purpose">Anwendungszweck</label>
             <select id="purpose" onchange="updateSettings()">
                 <option value="standard" selected>Standard / Deko</option>
-                <option value="functional">Funktionsteil (Stark)</option>
+                <option value="functional">Funktionsteil (Hohe Festigkeit)</option>
                 <option value="detail">Fein / Optik</option>
             </select>
         </div>
@@ -186,10 +239,11 @@
     <div class="results-grid">
         <div class="card">
             <h3>Temperatur & Kühlung</h3>
-            <div class="setting-row"><span class="setting-label">Düse:</span><span class="setting-value" id="nozzleTemp">-</span></div>
+            <div class="setting-row"><span class="setting-label">Düse (Nozzle):</span><span class="setting-value" id="nozzleTemp">-</span></div>
             <div class="setting-row"><span class="setting-label">Druckbett:</span><span class="setting-value" id="bedTemp">-</span></div>
             <div class="setting-row"><span class="setting-label">Bauteillüfter:</span><span class="setting-value" id="fanSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Gehäuse:</span><span class="setting-value" id="chamberTip">-</span></div>
+            <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
         </div>
 
         <div class="card">
@@ -199,11 +253,19 @@
             <div class="setting-row"><span class="setting-label">Bottom Schichten:</span><span class="setting-value" id="bottomLayers">-</span></div>
             <div class="setting-row"><span class="setting-label">Infill %:</span><span class="setting-value" id="infillDensity">-</span></div>
             <div class="setting-row"><span class="setting-label">Füllmuster:</span><span class="setting-value" id="infillPattern">-</span></div>
-            <div class="setting-row"><span class="setting-label">Bügeln:</span><span class="setting-value" id="ironing">-</span></div>
+            <div class="setting-row"><span class="setting-label">Bügeln (Ironing):</span><span class="setting-value" id="ironing">-</span></div>
         </div>
 
         <div class="card">
-            <h3>Geschwindigkeit</h3>
+            <h3>Support & Stützstruktur</h3>
+            <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Auto)</span></div>
+            <div class="setting-row"><span class="setting-label">Z-Abstand Top:</span><span class="setting-value" id="supportZDistance">0.20 mm</span></div>
+            <div class="setting-row"><span class="setting-label">Interface Layer:</span><span class="setting-value" id="supportInterface">3 Schichten</span></div>
+            <div class="setting-row"><span class="setting-label">Überhangswinkel:</span><span class="setting-value" id="supportAngle">30°</span></div>
+        </div>
+
+        <div class="card">
+            <h3>Geschwindigkeit & Flow</h3>
             <div class="setting-row"><span class="setting-label">Außenwand:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Innenwand:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Top Surface:</span><span class="setting-value" id="topSpeed">-</span></div>
@@ -213,40 +275,89 @@
     </div>
 
     <div class="tip-box">
-        <strong>Tipp für das Material:</strong>
+        <strong>Material & Marken Hinweis:</strong>
         <span id="materialNotes">-</span>
     </div>
 </div>
 
 <script>
-const database = {
-    PLA: { nozzle: "215°C - 220°C", bed: "55°C - 60°C", fan: "100%", flow: "0.98", notes: "Gute Haftung auf PEI. Bei P1S/H2D Tür spaltbreit offen lassen wegen Heat Creep." },
-    PETG: { nozzle: "240°C - 255°C", bed: "70°C - 80°C", fan: "40% - 60%", flow: "0.95", notes: "Langsamer drucken als PLA für perfekte Layerhaftung. Filament gut trocknen!" },
-    ABS: { nozzle: "250°C - 265°C", bed: "90°C - 100°C", fan: "0% - 20%", flow: "0.95", notes: "Geschlossener Bauraum Pflicht! 15 Min. vorheizen, Lüfter minimal halten gegen Warping." },
-    ASA: { nozzle: "255°C - 270°C", bed: "95°C - 105°C", fan: "0% - 25%", flow: "0.95", notes: "UV-beständig. Geschlossenes Gehäuse Pflicht! Nach Druck langsam abkühlen lassen." },
-    TPU: { nozzle: "220°C - 235°C", bed: "35°C - 45°C", fan: "80% - 100%", flow: "1.00", notes: "Nicht über AMS nutzen! Direkt vom externen Halter zuführen und sehr langsam drucken (max. 30-50 mm/s)." }
+const matDatabase = {
+    "PLA":      { nozzle: [210, 220], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "21 mm³/s", supportZ: "0.20 mm", hardNozzle: false },
+    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "18 mm³/s", supportZ: "0.20 mm", hardNozzle: true },
+    "PETG":     { nozzle: [235, 250], bed: [70, 80],  fan: "40-60%", flow: 0.95, vol: "13 mm³/s", supportZ: "0.24 mm", hardNozzle: false },
+    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  fan: "30-50%", flow: 0.95, vol: "12 mm³/s", supportZ: "0.24 mm", hardNozzle: true },
+    "ABS":      { nozzle: [245, 265], bed: [90, 100], fan: "0-20%", flow: 0.95, vol: "16 mm³/s", supportZ: "0.20 mm", hardNozzle: false },
+    "ASA":      { nozzle: [250, 270], bed: [95, 105], fan: "0-25%", flow: 0.95, vol: "15 mm³/s", supportZ: "0.20 mm", hardNozzle: false },
+    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], fan: "0-20%", flow: 0.95, vol: "14 mm³/s", supportZ: "0.22 mm", hardNozzle: true },
+    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], fan: "0-10%", flow: 0.96, vol: "10 mm³/s", supportZ: "0.25 mm", hardNozzle: true },
+    "TPU":      { nozzle: [220, 235], bed: [30, 45],  fan: "80-100%", flow: 1.00, vol: "3.5 mm³/s", supportZ: "0.20 mm", hardNozzle: false }
 };
+
+const brandOffsets = {
+    "bambu":    { tempAdd: 0,  flowMult: 1.00, note: "Original Bambu Filament: Perfekt abgestimmt mit RFID-Tag." },
+    "sunlu":    { tempAdd: -5, flowMult: 0.98, note: "Sunlu Filament: Neigt zu höherem Fluss, Flow Ratio leicht reduziert." },
+    "esun":     { tempAdd: 5,  flowMult: 0.99, note: "eSUN Filament: Benötigt oft 5°C mehr Temperatur für optimale Layerhaftung." },
+    "geeetech": { tempAdd: 0,  flowMult: 0.97, note: "Geeetech Filament: Solide Basiswerte, bei Stringing Einzugslänge prüfen." },
+    "tinmorry": { tempAdd: 0,  flowMult: 0.98, note: "Tinmorry Filament: Sehr gleichmäßiger Durchmesser, ideal für feine Oberflächen." }
+};
+
+function handleFileSelect(evt) {
+    const file = evt.target.files[0];
+    if (file) {
+        document.getElementById('fileNameDisplay').innerText = "Geladen: " + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+        
+        // Datei-Analyse Heuristik für Supports
+        const fname = file.name.toLowerCase();
+        if (fname.includes("support") || fname.includes("statue") || fname.includes("figure") || file.size > 2000000) {
+            document.getElementById("supportType").innerText = "Tree (Slim / Organic)";
+            document.getElementById("supportAngle").innerText = "25° (Empfohlen)";
+        } else {
+            document.getElementById("supportType").innerText = "Tree (Auto)";
+            document.getElementById("supportAngle").innerText = "30°";
+        }
+    }
+}
 
 function updateSettings() {
     const printer = document.getElementById("printer").value;
+    const brand = document.getElementById("brand").value;
     const material = document.getElementById("material").value;
     const purpose = document.getElementById("purpose").value;
-    const matData = database[material];
 
-    document.getElementById("nozzleTemp").innerText = matData.nozzle;
-    document.getElementById("bedTemp").innerText = matData.bed;
-    document.getElementById("fanSpeed").innerText = matData.fan;
-    document.getElementById("flowRatio").innerText = matData.flow;
-    document.getElementById("materialNotes").innerText = matData.notes;
+    const mat = matDatabase[material];
+    const br = brandOffsets[brand];
 
-    if (material === "ABS" || material === "ASA") {
+    // Temperatureinstellungen berechnen
+    const minNozz = mat.nozzle[0] + br.tempAdd;
+    const maxNozz = mat.nozzle[1] + br.tempAdd;
+    const calcFlow = (mat.flow * br.flowMult).toFixed(2);
+
+    document.getElementById("nozzleTemp").innerText = minNozz + "°C - " + maxNozz + "°C";
+    document.getElementById("bedTemp").innerText = mat.bed[0] + "°C - " + mat.bed[1] + "°C";
+    document.getElementById("fanSpeed").innerText = mat.fan;
+    document.getElementById("flowRatio").innerText = calcFlow;
+    document.getElementById("maxVolumetric").innerText = mat.vol;
+    document.getElementById("supportZDistance").innerText = mat.supportZ;
+
+    // Gehärtete Düsen Warnung
+    const hwAlert = document.getElementById("hardwareAlert");
+    if (mat.hardNozzle) {
+        hwAlert.style.display = "block";
+        hwAlert.innerHTML = "⚠️ <strong>Achtung:</strong> Für " + material + " benötigst du eine <strong>gehärtete Düse (Hardened Steel)</strong> und einen gehärteten Extruder!";
+    } else {
+        hwAlert.style.display = "none";
+    }
+
+    // Gehäuse Hinweise
+    if (material.includes("ABS") || material.includes("ASA") || material.includes("PA")) {
         document.getElementById("chamberTip").innerText = printer === "P1P" ? "Gehäuse nachrüsten!" : "Geschlossen (Vorheizen)";
-    } else if (material === "PLA") {
+    } else if (material.includes("PLA")) {
         document.getElementById("chamberTip").innerText = printer === "P1P" ? "Offen" : "Tür/Deckel ankippen";
     } else {
         document.getElementById("chamberTip").innerText = "Geschlossen";
     }
 
+    // Wand-, Infill- und Speeds basierend auf Zweck
     if (purpose === "standard") {
         document.getElementById("wallLoops").innerText = "2 - 3";
         document.getElementById("topLayers").innerText = "4 - 5";
@@ -281,6 +392,8 @@ function updateSettings() {
         document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
         document.getElementById("topSpeed").innerText = material === "TPU" ? "20 mm/s" : "80 mm/s";
     }
+
+    document.getElementById("materialNotes").innerText = br.note + " " + (material.includes("CF") || material.includes("GF") ? "Faserverstärktes Material: Trocknung vor Druck dringend empfohlen!" : "");
 }
 
 updateSettings();
@@ -288,4 +401,3 @@ updateSettings();
 
 </body>
 </html>
-
