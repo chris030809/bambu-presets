@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bambu Slicer Pro Presets</title>
+    <title>Bambu Slicer Pro Tool - Presets & Support Matrix</title>
     <style>
         :root {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --accent: #00ae42;
             --accent-warn: #e67e22;
+            --accent-blue: #3498db;
             --text-color: #ffffff;
             --text-muted: #a0a0a0;
             --border-color: #333333;
@@ -30,7 +31,7 @@
         }
 
         .container {
-            max-width: 650px;
+            max-width: 680px;
             margin: 0 auto;
         }
 
@@ -88,11 +89,10 @@
             background-size: 20px;
         }
 
-        /* File Drop Zone */
         .drop-zone {
             border: 2px dashed var(--accent);
             border-radius: 12px;
-            padding: 15px;
+            padding: 16px;
             text-align: center;
             background: #18261c;
             color: #fff;
@@ -120,10 +120,18 @@
             border-left: 5px solid var(--accent);
         }
 
+        .card.support-card {
+            border-left-color: var(--accent-blue);
+        }
+
         .card h3 {
             margin: 0 0 10px 0;
             font-size: 1.05rem;
             color: var(--accent);
+        }
+
+        .card.support-card h3 {
+            color: var(--accent-blue);
         }
 
         .setting-row {
@@ -179,12 +187,11 @@
 <body>
 
 <div class="container">
-    <h1>Bambu Slicer Pro Presets</h1>
+    <h1>Bambu Slicer Pro Tool</h1>
 
-    <!-- 3D Datei Analyse -->
     <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
-        <strong>📁 STL / 3MF / STEP Datei laden</strong>
-        <p id="fileNameDisplay">Datei hierher ziehen oder tippen zum Auswählen</p>
+        <strong>📁 STL / 3MF / STEP Datei importieren</strong>
+        <p id="fileNameDisplay">Datei antippen oder hineinziehen für Auto-Analyse</p>
         <input type="file" id="fileInput" accept=".stl,.3mf,.step" style="display:none" onchange="handleFileSelect(event)">
     </div>
 
@@ -194,9 +201,9 @@
         <div class="form-group">
             <label for="printer">Drucker Modell</label>
             <select id="printer" onchange="updateSettings()">
+                <option value="H2D" selected>Bambu Lab H2D Series (Dual Nozzle)</option>
+                <option value="P1S">Bambu Lab P1S (AMS Single-Nozzle)</option>
                 <option value="P1P">Bambu Lab P1P (Offen)</option>
-                <option value="P1S" selected>Bambu Lab P1S (Geschlossen)</option>
-                <option value="H2D">Bambu Lab H2D Series</option>
             </select>
         </div>
 
@@ -212,7 +219,7 @@
         </div>
 
         <div class="form-group">
-            <label for="material">Filament Typ</label>
+            <label for="material">Haupt-Filament (Modell)</label>
             <select id="material" onchange="updateSettings()">
                 <option value="PLA" selected>PLA / PLA+</option>
                 <option value="PLA-CF">PLA-CF (Carbon)</option>
@@ -227,19 +234,46 @@
         </div>
 
         <div class="form-group">
-            <label for="purpose">Anwendungszweck</label>
+            <label for="supportMaterial">Support / Trennschicht Material</label>
+            <select id="supportMaterial" onchange="updateSettings()">
+                <option value="same" selected>Gleiches Material (Schnittstelle mit Hauptmaterial)</option>
+                <option value="support_pla">Bambu Support for PLA (Dedicated Interface)</option>
+                <option value="support_petg">Bambu Support for PETG / ABS</option>
+                <option value="pva">PVA / BVOH (Wasserlöslich)</option>
+                <option value="petg_for_pla">PETG als Trennschicht für PLA (Dual/AMS)</option>
+                <option value="pla_for_petg">PLA als Trennschicht für PETG (Dual/AMS)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="purpose">Erkannte Geometrie / Zweck</label>
             <select id="purpose" onchange="updateSettings()">
-                <option value="standard" selected>Standard / Deko</option>
-                <option value="functional">Funktionsteil (Hohe Festigkeit)</option>
-                <option value="detail">Fein / Optik</option>
+                <option value="standard" selected>Standard / Allround</option>
+                <option value="functional">Funktionsteil (Hohe Last / Torsion)</option>
+                <option value="detail">Organisch / Figur (Optischer Fokus)</option>
+                <option value="thinwall">Dünnwandig / Gehäuse</option>
             </select>
         </div>
     </div>
 
     <div class="results-grid">
+        <!-- Professional Support Card -->
+        <div class="card support-card">
+            <h3>Support & Trennschicht (Pro Settings)</h3>
+            <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Slim / Auto)</span></div>
+            <div class="setting-row"><span class="setting-label">Schnittstellen Extruder:</span><span class="setting-value" id="supportExtruder">T2 (Support-Düsenkopf)</span></div>
+            <div class="setting-row"><span class="setting-label">Top Z-Abstand (Z-Distance):</span><span class="setting-value" id="supportZDistance">0.20 mm</span></div>
+            <div class="setting-row"><span class="setting-label">Bottom Z-Abstand:</span><span class="setting-value" id="supportBottomZ">0.20 mm</span></div>
+            <div class="setting-row"><span class="setting-label">Schnittstellen-Schichten:</span><span class="setting-value" id="supportInterface">3 Schichten</span></div>
+            <div class="setting-row"><span class="setting-label">Schnittstellen-Muster:</span><span class="setting-value" id="supportPattern">Concentric / Rectangular</span></div>
+            <div class="setting-row"><span class="setting-label">Schnittstellen-Abstand:</span><span class="setting-value" id="supportSpacing">0.0 mm (Dicht)</span></div>
+            <div class="setting-row"><span class="setting-label">XY-Abstand zur Wand:</span><span class="setting-value" id="supportXYDistance">0.35 mm</span></div>
+            <div class="setting-row"><span class="setting-label">Schwellenwinkel (Threshold):</span><span class="setting-value" id="supportAngle">30°</span></div>
+        </div>
+
         <div class="card">
             <h3>Temperatur & Kühlung</h3>
-            <div class="setting-row"><span class="setting-label">Düse (Nozzle):</span><span class="setting-value" id="nozzleTemp">-</span></div>
+            <div class="setting-row"><span class="setting-label">Düse (Nozzle Haupt):</span><span class="setting-value" id="nozzleTemp">-</span></div>
             <div class="setting-row"><span class="setting-label">Druckbett:</span><span class="setting-value" id="bedTemp">-</span></div>
             <div class="setting-row"><span class="setting-label">Bauteillüfter:</span><span class="setting-value" id="fanSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Gehäuse:</span><span class="setting-value" id="chamberTip">-</span></div>
@@ -247,87 +281,89 @@
         </div>
 
         <div class="card">
-            <h3>Wände & Oberflächen</h3>
+            <h3>Wände & Infill-Geometrie</h3>
             <div class="setting-row"><span class="setting-label">Wandlinien:</span><span class="setting-value" id="wallLoops">-</span></div>
-            <div class="setting-row"><span class="setting-label">Top Schichten:</span><span class="setting-value" id="topLayers">-</span></div>
-            <div class="setting-row"><span class="setting-label">Bottom Schichten:</span><span class="setting-value" id="bottomLayers">-</span></div>
+            <div class="setting-row"><span class="setting-label">Wand-Reihenfolge:</span><span class="setting-value" id="wallOrder">-</span></div>
+            <div class="setting-row"><span class="setting-label">Top / Bottom:</span><span class="setting-value" id="topBottomLayers">-</span></div>
             <div class="setting-row"><span class="setting-label">Infill %:</span><span class="setting-value" id="infillDensity">-</span></div>
-            <div class="setting-row"><span class="setting-label">Füllmuster:</span><span class="setting-value" id="infillPattern">-</span></div>
+            <div class="setting-row"><span class="setting-label">Optimales Muster:</span><span class="setting-value" id="infillPattern">-</span></div>
             <div class="setting-row"><span class="setting-label">Bügeln (Ironing):</span><span class="setting-value" id="ironing">-</span></div>
         </div>
 
         <div class="card">
-            <h3>Support & Stützstruktur</h3>
-            <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Auto)</span></div>
-            <div class="setting-row"><span class="setting-label">Z-Abstand Top:</span><span class="setting-value" id="supportZDistance">0.20 mm</span></div>
-            <div class="setting-row"><span class="setting-label">Interface Layer:</span><span class="setting-value" id="supportInterface">3 Schichten</span></div>
-            <div class="setting-row"><span class="setting-label">Überhangswinkel:</span><span class="setting-value" id="supportAngle">30°</span></div>
-        </div>
-
-        <div class="card">
-            <h3>Geschwindigkeit & Flow</h3>
-            <div class="setting-row"><span class="setting-label">Außenwand:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Innenwand:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Top Surface:</span><span class="setting-value" id="topSpeed">-</span></div>
+            <h3>Geschwindigkeit & Naht</h3>
+            <div class="setting-row"><span class="setting-label">Außenwand Speed:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Innenwand Speed:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
+            <div class="setting-row"><span class="setting-label">Top Surface Speed:</span><span class="setting-value" id="topSpeed">-</span></div>
             <div class="setting-row"><span class="setting-label">Schichthöhe:</span><span class="setting-value" id="layerHeight">-</span></div>
             <div class="setting-row"><span class="setting-label">Flow Ratio:</span><span class="setting-value" id="flowRatio">-</span></div>
+            <div class="setting-row"><span class="setting-label">Naht-Ausrichtung:</span><span class="setting-value" id="seamPos">-</span></div>
         </div>
     </div>
 
     <div class="tip-box">
-        <strong>Material & Marken Hinweis:</strong>
-        <span id="materialNotes">-</span>
+        <strong>Expertentipp für Support & Geometrie:</strong>
+        <span id="geometryNote">-</span>
     </div>
 </div>
 
 <script>
 const matDatabase = {
-    "PLA":      { nozzle: [210, 220], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "21 mm³/s", supportZ: "0.20 mm", hardNozzle: false },
-    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "18 mm³/s", supportZ: "0.20 mm", hardNozzle: true },
-    "PETG":     { nozzle: [235, 250], bed: [70, 80],  fan: "40-60%", flow: 0.95, vol: "13 mm³/s", supportZ: "0.24 mm", hardNozzle: false },
-    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  fan: "30-50%", flow: 0.95, vol: "12 mm³/s", supportZ: "0.24 mm", hardNozzle: true },
-    "ABS":      { nozzle: [245, 265], bed: [90, 100], fan: "0-20%", flow: 0.95, vol: "16 mm³/s", supportZ: "0.20 mm", hardNozzle: false },
-    "ASA":      { nozzle: [250, 270], bed: [95, 105], fan: "0-25%", flow: 0.95, vol: "15 mm³/s", supportZ: "0.20 mm", hardNozzle: false },
-    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], fan: "0-20%", flow: 0.95, vol: "14 mm³/s", supportZ: "0.22 mm", hardNozzle: true },
-    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], fan: "0-10%", flow: 0.96, vol: "10 mm³/s", supportZ: "0.25 mm", hardNozzle: true },
-    "TPU":      { nozzle: [220, 235], bed: [30, 45],  fan: "80-100%", flow: 1.00, vol: "3.5 mm³/s", supportZ: "0.20 mm", hardNozzle: false }
+    "PLA":      { nozzle: [210, 220], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "21 mm³/s", defaultZ: "0.20 mm", hardNozzle: false },
+    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  fan: "100%", flow: 0.98, vol: "18 mm³/s", defaultZ: "0.20 mm", hardNozzle: true },
+    "PETG":     { nozzle: [235, 250], bed: [70, 80],  fan: "40-60%", flow: 0.95, vol: "13 mm³/s", defaultZ: "0.24 mm", hardNozzle: false },
+    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  fan: "30-50%", flow: 0.95, vol: "12 mm³/s", defaultZ: "0.24 mm", hardNozzle: true },
+    "ABS":      { nozzle: [245, 265], bed: [90, 100], fan: "0-20%", flow: 0.95, vol: "16 mm³/s", defaultZ: "0.20 mm", hardNozzle: false },
+    "ASA":      { nozzle: [250, 270], bed: [95, 105], fan: "0-25%", flow: 0.95, vol: "15 mm³/s", defaultZ: "0.20 mm", hardNozzle: false },
+    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], fan: "0-20%", flow: 0.95, vol: "14 mm³/s", defaultZ: "0.22 mm", hardNozzle: true },
+    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], fan: "0-10%", flow: 0.96, vol: "10 mm³/s", defaultZ: "0.25 mm", hardNozzle: true },
+    "TPU":      { nozzle: [220, 235], bed: [30, 45],  fan: "80-100%", flow: 1.00, vol: "3.5 mm³/s", defaultZ: "0.20 mm", hardNozzle: false }
 };
 
 const brandOffsets = {
-    "bambu":    { tempAdd: 0,  flowMult: 1.00, note: "Original Bambu Filament: Perfekt abgestimmt mit RFID-Tag." },
-    "sunlu":    { tempAdd: -5, flowMult: 0.98, note: "Sunlu Filament: Neigt zu höherem Fluss, Flow Ratio leicht reduziert." },
-    "esun":     { tempAdd: 5,  flowMult: 0.99, note: "eSUN Filament: Benötigt oft 5°C mehr Temperatur für optimale Layerhaftung." },
-    "geeetech": { tempAdd: 0,  flowMult: 0.97, note: "Geeetech Filament: Solide Basiswerte, bei Stringing Einzugslänge prüfen." },
-    "tinmorry": { tempAdd: 0,  flowMult: 0.98, note: "Tinmorry Filament: Sehr gleichmäßiger Durchmesser, ideal für feine Oberflächen." }
+    "bambu":    { tempAdd: 0,  flowMult: 1.00, note: "Bambu Original: Optimal kalibriert." },
+    "sunlu":    { tempAdd: -5, flowMult: 0.98, note: "Sunlu: Leicht reduzierter Flow für sauberere Oberflächen." },
+    "esun":     { tempAdd: 5,  flowMult: 0.99, note: "eSUN: +5°C Höhere Temperatur für maximale Festigkeit." },
+    "geeetech": { tempAdd: 0,  flowMult: 0.97, note: "Geeetech: Geringerer Fluss reduziert Fädenbildung." },
+    "tinmorry": { tempAdd: 0,  flowMult: 0.98, note: "Tinmorry: Gleichmäßige Schichten." }
 };
 
 function handleFileSelect(evt) {
     const file = evt.target.files[0];
-    if (file) {
-        document.getElementById('fileNameDisplay').innerText = "Geladen: " + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
-        
-        // Datei-Analyse Heuristik für Supports
-        const fname = file.name.toLowerCase();
-        if (fname.includes("support") || fname.includes("statue") || fname.includes("figure") || file.size > 2000000) {
-            document.getElementById("supportType").innerText = "Tree (Slim / Organic)";
-            document.getElementById("supportAngle").innerText = "25° (Empfohlen)";
-        } else {
-            document.getElementById("supportType").innerText = "Tree (Auto)";
-            document.getElementById("supportAngle").innerText = "30°";
-        }
+    if (!file) return;
+
+    const fname = file.name.toLowerCase();
+    const size = file.size;
+
+    document.getElementById('fileNameDisplay').innerText = "Analyse: " + file.name + " (" + (size / 1024).toFixed(1) + " KB)";
+
+    const purposeSelect = document.getElementById("purpose");
+
+    if (fname.includes("statue") || fname.includes("figure") || fname.includes("bust")) {
+        purposeSelect.value = "detail";
+    } else if (fname.includes("gear") || fname.includes("mount") || fname.includes("bracket")) {
+        purposeSelect.value = "functional";
+    } else if (fname.includes("box") || fname.includes("case") || fname.includes("thin")) {
+        purposeSelect.value = "thinwall";
+    } else if (size > 5000000) {
+        purposeSelect.value = "detail";
+    } else {
+        purposeSelect.value = "standard";
     }
+
+    updateSettings();
 }
 
 function updateSettings() {
     const printer = document.getElementById("printer").value;
     const brand = document.getElementById("brand").value;
     const material = document.getElementById("material").value;
+    const suppMat = document.getElementById("supportMaterial").value;
     const purpose = document.getElementById("purpose").value;
 
     const mat = matDatabase[material];
     const br = brandOffsets[brand];
 
-    // Temperatureinstellungen berechnen
     const minNozz = mat.nozzle[0] + br.tempAdd;
     const maxNozz = mat.nozzle[1] + br.tempAdd;
     const calcFlow = (mat.flow * br.flowMult).toFixed(2);
@@ -337,18 +373,17 @@ function updateSettings() {
     document.getElementById("fanSpeed").innerText = mat.fan;
     document.getElementById("flowRatio").innerText = calcFlow;
     document.getElementById("maxVolumetric").innerText = mat.vol;
-    document.getElementById("supportZDistance").innerText = mat.supportZ;
 
-    // Gehärtete Düsen Warnung
+    // Hardware Alert
     const hwAlert = document.getElementById("hardwareAlert");
     if (mat.hardNozzle) {
         hwAlert.style.display = "block";
-        hwAlert.innerHTML = "⚠️ <strong>Achtung:</strong> Für " + material + " benötigst du eine <strong>gehärtete Düse (Hardened Steel)</strong> und einen gehärteten Extruder!";
+        hwAlert.innerHTML = "⚠️ <strong>Achtung:</strong> Für " + material + " benötigst du eine <strong>gehärtete Düse (Hardened Steel)</strong>!";
     } else {
         hwAlert.style.display = "none";
     }
 
-    // Gehäuse Hinweise
+    // Gehäuse
     if (material.includes("ABS") || material.includes("ASA") || material.includes("PA")) {
         document.getElementById("chamberTip").innerText = printer === "P1P" ? "Gehäuse nachrüsten!" : "Geschlossen (Vorheizen)";
     } else if (material.includes("PLA")) {
@@ -357,43 +392,106 @@ function updateSettings() {
         document.getElementById("chamberTip").innerText = "Geschlossen";
     }
 
-    // Wand-, Infill- und Speeds basierend auf Zweck
-    if (purpose === "standard") {
-        document.getElementById("wallLoops").innerText = "2 - 3";
-        document.getElementById("topLayers").innerText = "4 - 5";
-        document.getElementById("bottomLayers").innerText = "3 - 4";
-        document.getElementById("infillDensity").innerText = "15% - 20%";
-        document.getElementById("infillPattern").innerText = "Gyroid / Cross Hatch";
-        document.getElementById("ironing").innerText = "Aus / Top Layer";
-        document.getElementById("layerHeight").innerText = "0.20 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "200 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "40 mm/s" : "300 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
-    } else if (purpose === "functional") {
-        document.getElementById("wallLoops").innerText = "4 - 6";
-        document.getElementById("topLayers").innerText = "5 - 6";
-        document.getElementById("bottomLayers").innerText = "4 - 5";
-        document.getElementById("infillDensity").innerText = "30% - 50%";
-        document.getElementById("infillPattern").innerText = "Gyroid / Cubic";
-        document.getElementById("ironing").innerText = "Aus";
-        document.getElementById("layerHeight").innerText = "0.20 - 0.24 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "25 mm/s" : "120 - 150 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "200 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "25 mm/s" : "100 mm/s";
-    } else if (purpose === "detail") {
-        document.getElementById("wallLoops").innerText = "3";
-        document.getElementById("topLayers").innerText = "6";
-        document.getElementById("bottomLayers").innerText = "5";
-        document.getElementById("infillDensity").innerText = "15%";
-        document.getElementById("infillPattern").innerText = "Gyroid";
-        document.getElementById("ironing").innerText = "An (Top Surfaces)";
-        document.getElementById("layerHeight").innerText = "0.12 - 0.16 mm";
-        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "20 mm/s" : "80 - 100 mm/s";
-        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
-        document.getElementById("topSpeed").innerText = material === "TPU" ? "20 mm/s" : "80 mm/s";
+    // SUPPORT LOGIK (PROFESSIONAL MATRIX)
+    let zDist = mat.defaultZ;
+    let bZDist = mat.defaultZ;
+    let interLayers = "3 Schichten";
+    let interPattern = "Concentric";
+    let interSpacing = "0.20 mm";
+    let extText = "T1 (Gleicher Kopf)";
+    let suppNote = "";
+
+    if (printer === "H2D") {
+        extText = "T2 (2. Extruder-Düse)";
+    } else if (printer === "P1S") {
+        extText = "AMS Slot (Multimaterial)";
     }
 
-    document.getElementById("materialNotes").innerText = br.note + " " + (material.includes("CF") || material.includes("GF") ? "Faserverstärktes Material: Trocknung vor Druck dringend empfohlen!" : "");
+    if (suppMat !== "same") {
+        // Trennschicht-Material aktiviert
+        zDist = "0.00 mm (Perfekte Unterseite!)";
+        bZDist = "0.00 mm";
+        interLayers = "3 - 4 Schichten";
+        interPattern = "Rectangular / Concentric";
+        interSpacing = "0.00 mm (Vollflächig)";
+        suppNote = "Spezial-Support / Trennschicht aktiv! Dank 0.00mm Z-Abstand wird die Unterseite spiegelglatt. ";
+    } else {
+        // Monomaterial Support
+        zDist = mat.defaultZ;
+        bZDist = mat.defaultZ;
+        interLayers = "2 Schichten";
+        interPattern = "Rectangular Grid";
+        interSpacing = "0.50 mm";
+        suppNote = "Monomaterial Support: Z-Abstand auf " + zDist + " gesetzt für einfaches Abbrechen. ";
+    }
+
+    document.getElementById("supportZDistance").innerText = zDist;
+    document.getElementById("supportBottomZ").innerText = bZDist;
+    document.getElementById("supportInterface").innerText = interLayers;
+    document.getElementById("supportPattern").innerText = interPattern;
+    document.getElementById("supportSpacing").innerText = interSpacing;
+    document.getElementById("supportExtruder").innerText = suppMat === "same" ? "T1 (Haupt-Düse)" : extText;
+    document.getElementById("supportXYDistance").innerText = purpose === "detail" ? "0.40 mm" : "0.35 mm";
+
+    // Zweck & Geometrie-Logik
+    if (purpose === "functional") {
+        document.getElementById("wallLoops").innerText = "4 - 5 Linear";
+        document.getElementById("wallOrder").innerText = "Inner / Outer / Inner";
+        document.getElementById("topBottomLayers").innerText = "5 Top / 4 Bottom";
+        document.getElementById("infillDensity").innerText = "25% - 40%";
+        document.getElementById("infillPattern").innerText = "Wabenmuster / Hexagon";
+        document.getElementById("ironing").innerText = "Aus";
+        document.getElementById("layerHeight").innerText = "0.20 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "25 mm/s" : "100 - 120 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "35 mm/s" : "200 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "25 mm/s" : "100 mm/s";
+        document.getElementById("seamPos").innerText = "Scharfe Ecke (Aligned)";
+        suppNote += "Wabenmuster für maximale Torsionssteifigkeit.";
+    
+    } else if (purpose === "detail") {
+        document.getElementById("wallLoops").innerText = "3 Linien";
+        document.getElementById("wallOrder").innerText = "Outer / Inner (Präzise)";
+        document.getElementById("topBottomLayers").innerText = "6 Top / 5 Bottom";
+        document.getElementById("infillDensity").innerText = "12% - 15%";
+        document.getElementById("infillPattern").innerText = "Gyroid (Vibrationsarm)";
+        document.getElementById("ironing").innerText = "An (Top Surfaces)";
+        document.getElementById("layerHeight").innerText = "0.08 - 0.12 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "20 mm/s" : "60 - 80 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "120 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "20 mm/s" : "60 mm/s";
+        document.getElementById("seamPos").innerText = "Verdeckt (Back)";
+        suppNote += "Gyroid verhindert Eigenresonanz und Ghosting. Tree-Support nutzen.";
+
+    } else if (purpose === "thinwall") {
+        document.getElementById("wallLoops").innerText = "2 - 3 Linien";
+        document.getElementById("wallOrder").innerText = "Inner / Outer";
+        document.getElementById("topBottomLayers").innerText = "4 Top / 4 Bottom";
+        document.getElementById("infillDensity").innerText = "100% (Solid)";
+        document.getElementById("infillPattern").innerText = "Monotonic Line";
+        document.getElementById("ironing").innerText = "Aus";
+        document.getElementById("layerHeight").innerText = "0.16 - 0.20 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "25 mm/s" : "90 - 110 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "35 mm/s" : "150 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "25 mm/s" : "80 mm/s";
+        document.getElementById("seamPos").innerText = "Ecke";
+        suppNote += "Vollmaterial-Einstellung für Gehäuse ohne Schwingungsringe.";
+
+    } else {
+        document.getElementById("wallLoops").innerText = "3 Linien";
+        document.getElementById("wallOrder").innerText = "Inner / Outer";
+        document.getElementById("topBottomLayers").innerText = "5 Top / 4 Bottom";
+        document.getElementById("infillDensity").innerText = "15% - 20%";
+        document.getElementById("infillPattern").innerText = "Gyroid / Cross Hatch";
+        document.getElementById("ironing").innerText = "Aus / Auf Wunsch";
+        document.getElementById("layerHeight").innerText = "0.20 mm";
+        document.getElementById("outerWallSpeed").innerText = material === "TPU" ? "30 mm/s" : "150 mm/s";
+        document.getElementById("innerWallSpeed").innerText = material === "TPU" ? "40 mm/s" : "250 mm/s";
+        document.getElementById("topSpeed").innerText = material === "TPU" ? "30 mm/s" : "120 mm/s";
+        document.getElementById("seamPos").innerText = "Ausgerichtet";
+        suppNote += "Standard Allround-Preset.";
+    }
+
+    document.getElementById("geometryNote").innerText = suppNote;
 }
 
 updateSettings();
