@@ -324,6 +324,7 @@
             <div class="setting-row"><span class="setting-label">Schnittstellen-Muster:</span><span class="setting-value" id="supportPattern">Concentric / Rectangular</span></div>
             <div class="setting-row"><span class="setting-label">Schnittstellen-Abstand:</span><span class="setting-value" id="supportSpacing">0.0 mm (Dicht)</span></div>
             <div class="setting-row"><span class="setting-label">XY-Abstand zur Wand:</span><span class="setting-value" id="supportXYDistance">0.35 mm</span></div>
+            <div class="setting-row"><span class="setting-label">Schwellenwinkel (Threshold):</span><span class="setting-value" id="supportAngle">30°</span></div>
         </div>
 
         <div class="card">
@@ -337,7 +338,6 @@
 
         <div class="card">
             <h3>Wände & Infill-Geometrie</h3>
-            <div class="setting-row"><span class="setting-label">Schichthöhe (Layer Height):</span><span class="setting-value" id="layerHeight">0.20 mm</span></div>
             <div class="setting-row"><span class="setting-label">Wandlinien:</span><span class="setting-value" id="wallLoops">-</span></div>
             <div class="setting-row"><span class="setting-label">Wand-Reihenfolge:</span><span class="setting-value" id="wallOrder">-</span></div>
             <div class="setting-row"><span class="setting-label">Top / Bottom:</span><span class="setting-value" id="topBottomLayers">-</span></div>
@@ -481,7 +481,7 @@ function updateSettings() {
 
     if (buildPlate === "holo") {
         plateName = "Holo / PEO / PED (Effekt-Platte)";
-        bedTempFinal = mat.bed[0] + 5;
+        bedTempFinal = mat.bed[0] + 5; // Erhöht die Haftung für den Mikrostruktur-Transfer
         flWidth = "0.52 mm (Presst voll in die Hologramm-Struktur)";
         flFlowCalc = (calcFlow * 1.05).toFixed(2) + " (+5% Extra-Druck für Spiegeleffekt)";
         eleComp = "0.08 mm (Minimiert Wulst für flachen Effekt)";
