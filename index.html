@@ -276,6 +276,28 @@
       font-size: 0.85rem;
       display: none;
     }
+
+    .tree-view {
+      font-family: monospace;
+      font-size: 0.85rem;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 8px;
+      color: #38bdf8;
+    }
+
+    .tree-item {
+      padding: 2px 0;
+    }
+
+    .tree-item-sub {
+      padding-left: 16px;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
@@ -288,7 +310,7 @@
 
   <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
     <strong>📁 3D-Datei (STL/3MF) oder UV-Grafik importieren</strong>
-    <p id="fileNameDisplay">Datei antippen oder hineinziehen für Auto-Analyse</p>
+    <p id="fileNameDisplay">Datei antippen oder hineinziehen für Auto-Analyse & 3MF Objekt-Inspektion</p>
     <input type="file" id="fileInput" accept=".stl,.3mf,.step,.png,.jpg,.svg" style="display:none" onchange="handleFileSelect(event)">
   </div>
 
@@ -399,13 +421,37 @@
       <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
       <div class="setting-row"><span class="setting-label">Flow Ratio:</span><span class="setting-value" id="flowRatio">-</span></div>
       <div class="setting-row"><span class="setting-label">1. Layer Linienbreite:</span><span class="setting-value" id="flLineWidth">-</span></div>
+      <div class="setting-row"><span class="setting-label">1. Layer Geschwindigkeit:</span><span class="setting-value" id="firstLayerSpeed">50 mm/s</span></div>
       <div class="setting-row"><span class="setting-label">Außenwand Speed:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
+      <div class="setting-row"><span class="setting-label">Innenwand Speed:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
       <div class="setting-row"><span class="setting-label">Infill Speed:</span><span class="setting-value" id="infillSpeed">-</span></div>
+      <div class="setting-row"><span class="setting-label">Top/Bottom Surface Speed:</span><span class="setting-value" id="topSurfaceSpeed">-</span></div>
       <div class="setting-row"><span class="setting-label">Gehäuse/Tür:</span><span class="setting-value" id="chamberTip">-</span></div>
+
+      <hr style="border-color: var(--card-border); margin: 10px 0;">
+
+      <div class="setting-row"><span class="setting-label">Support-Typ:</span><span class="setting-value" id="supType">Baum (Tree) / Snug</span></div>
+      <div class="setting-row"><span class="setting-label">Obere Z-Distanz (Top Z):</span><span class="setting-value" id="supTopZ">0.20 mm</span></div>
+      <div class="setting-row"><span class="setting-label">Support XY-Abstand:</span><span class="setting-value" id="supXyDist">0.35 mm</span></div>
+      <div class="setting-row"><span class="setting-label">Schnittstellenschichten:</span><span class="setting-value" id="supInterface">3 Schichten</span></div>
 
       <div class="tip-box">
         <strong>Expertentipp für 3D-Druck:</strong>
         <span id="geometryNote">-</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1B: 3MF / STL OBJEKT-INSPEKTOR & BAUMANSICHT -->
+  <div class="section-title print3d" style="border-bottom-color: #38bdf8; color: #38bdf8;">🔍 1b. 3MF / STL Objekt-Inspektor (Inhalte & Komponenten)</div>
+  <div class="grid">
+    <div class="card print3d-card" style="grid-column: 1 / -1;">
+      <h3>Enthaltene Objekte & Dateistruktur</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+        Hier siehst du alle erkannten Bauteile, Platten (Platters) und Netz-Objekte innerhalb der geladenen Datei.
+      </p>
+      <div id="objectTreeDisplay" class="tree-view">
+        <em>Keine Datei geladen. Bitte oben eine .3mf, .stl oder .step Datei hochladen.</em>
       </div>
     </div>
   </div>
@@ -704,6 +750,8 @@
   </div>
 </div>
 
+<!-- Script zum Entpacken und Parsen von .3mf Dateien per JSZip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
   const matDatabase = {
     "PLA":      { nozzle: [210, 220], bed: [55, 65],  flow: 0.98, vol: 21, defaultZ: "0.20 mm", hardNozzle: false, shrink: 0.002 },
@@ -743,7 +791,60 @@
     } else if (fname.includes("cut") || fname.includes("split") || fname.includes("joint")) {
       fitSelect.value = "cut_assembly";
     }
+
+    // 3MF Objekt-Inspektion durchführen
+    if (fname.endsWith(".3mf")) {
+      inspect3mfFile(file);
+    } else {
+      document.getElementById('objectTreeDisplay').innerHTML = `
+        <div class="tree-item">📦 <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</div>
+        <div class="tree-item-sub">└─ Einzelnes 3D-Mesh / Objekt (keine 3MF-Slicerstruktur)</div>
+      `;
+    }
+
     calculate();
+  }
+
+  function inspect3mfFile(file) {
+    const treeDisplay = document.getElementById('objectTreeDisplay');
+    treeDisplay.innerHTML = '<em>Lade und analysiere 3MF-Struktur...</em>';
+
+    if (typeof JSZip === 'undefined') {
+      treeDisplay.innerHTML = '⚠️ JSZip Bibliothek nicht geladen.';
+      return;
+    }
+
+    JSZip.loadAsync(file).then(zip => {
+      let html = `<div class="tree-item">📁 <strong>${file.name}</strong></div>`;
+      let foundObjects = [];
+
+      // Suche nach Bambu Studio / Slicer spezifischen Modelldateien
+      let sliceDataFiles = Object.keys(zip.files).filter(f => f.startsWith('3D/') || f.endsWith('.model') || f.includes('plate'));
+
+      zip.forEach((relativePath, zipEntry) => {
+        if (relativePath.endsWith('.model')) {
+          foundObjects.push(relativePath);
+        }
+      });
+
+      if (foundObjects.length > 0) {
+        foundObjects.forEach((objPath, idx) => {
+          html += `<div class="tree-item-sub">├── 🧱 Objekt ${idx + 1}: ${objPath}</div>`;
+        });
+      } else {
+        html += `<div class="tree-item-sub">├── 🧱 Hauptmodell: 3D/3dmodel.model</div>`;
+      }
+
+      if (zip.files['Metadata/plate_1.png'] || zip.files['Metadata/slice_info.config']) {
+        html += `<div class="tree-item-sub">└── ⚙️ Enthält Bambu Studio Druckplatten- & Slicer-Profilmulden</div>`;
+      } else {
+        html += `<div class="tree-item-sub">└── 📄 Standard 3MF Geometrie-Container</div>`;
+      }
+
+      treeDisplay.innerHTML = html;
+    }).catch(err => {
+      treeDisplay.innerHTML = `<div class="tree-item">📦 <strong>${file.name}</strong></div><div class="tree-item-sub">└─ Standard 3MF Datei (XML Struktur nicht lesbar)</div>`;
+    });
   }
 
   function onPrinterChange() {
@@ -838,6 +939,33 @@
     let flWidth = buildPlate === "holo" ? "0.52 mm (Presst in Muster)" : "0.50 mm";
     document.getElementById("flLineWidth").innerText = flWidth;
 
+    // Support Parameter dynamisch berechnen
+    let topZDist = material.includes("PETG") ? "0.26 mm" : (material.includes("PLA") ? "0.20 mm" : "0.22 mm");
+    let xyDist = "0.35 mm";
+    let interfaceLayers = "3 Schichten";
+    let supTypeVal = "Baum (Tree) / Snug";
+
+    if (suppMat === "support_pla" || suppMat === "petg_for_pla" || suppMat === "pla_for_petg" || suppMat === "pva") {
+      topZDist = "0.00 mm (Direkter Kontakt dank AMS)";
+      interfaceLayers = "2 Schichten (Aktiv)";
+    }
+
+    document.getElementById("supTopZ").innerText = topZDist;
+    document.getElementById("supXyDist").innerText = xyDist;
+    document.getElementById("supInterface").innerText = interfaceLayers;
+    document.getElementById("supType").innerText = supTypeVal;
+
+    // Geschwindigkeiten erweitern
+    let baseOuter = 120, baseInner = 200, baseInfill = 270, baseTop = 120;
+    if (purpose === "detail") { baseOuter = 70; baseInner = 120; baseInfill = 180; baseTop = 80; }
+    else if (purpose === "functional") { baseOuter = 110; baseInner = 180; baseInfill = 250; baseTop = 110; }
+
+    document.getElementById("firstLayerSpeed").innerText = "50 mm/s";
+    document.getElementById("outerWallSpeed").innerText = Math.round(baseOuter * speedMult) + " mm/s";
+    document.getElementById("innerWallSpeed").innerText = Math.round(baseInner * speedMult) + " mm/s";
+    document.getElementById("infillSpeed").innerText = Math.round(baseInfill * speedMult) + " mm/s";
+    document.getElementById("topSurfaceSpeed").innerText = Math.round(baseTop * speedMult) + " mm/s";
+
     // 2. PASSGENAUIGKEIT & IRONING LOGIK
     const fitType = document.getElementById("fitType").value;
     const eleFootToggle = document.getElementById("eleFootToggle").value;
@@ -890,14 +1018,6 @@
       document.getElementById("ironingResult").innerText = iFlow + "% Flow @ " + iSpeed + " mm/s";
       document.getElementById("ironingSpacing").innerText = "0.15 mm (Standard)";
     }
-
-    // Geschwindigkeiten
-    let baseOuter = 120, baseInfill = 270;
-    if (purpose === "detail") { baseOuter = 70; baseInfill = 180; }
-    else if (purpose === "functional") { baseOuter = 110; baseInfill = 250; }
-
-    document.getElementById("outerWallSpeed").innerText = Math.round(baseOuter * speedMult) + " mm/s";
-    document.getElementById("infillSpeed").innerText = Math.round(baseInfill * speedMult) + " mm/s";
 
     let suppNote = suppMat !== "none" ? (suppMat !== "same" ? "Schnittstellen-Material gewählt (0.00mm Z-Abstand)." : "Standard Support aktiv.") : "Kein Support.";
     document.getElementById("geometryNote").innerText = suppNote;
