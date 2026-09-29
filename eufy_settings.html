@@ -14,6 +14,8 @@
             --text-muted: #a0aab8;
             --border: #2e3440;
             --warning: #ff9f43;
+            --google-btn: #4285f4;
+            --google-btn-hover: #3367d6;
         }
 
         body {
@@ -40,6 +42,41 @@
 
         h1 { margin: 0; font-size: 1.8rem; color: var(--accent); }
         .subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Suchleiste */
+        .search-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            font-size: 1rem;
+            padding: 12px;
+        }
+
+        .btn-google {
+            background: var(--google-btn);
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-google:hover { background: var(--google-btn-hover); }
 
         .grid {
             display: grid;
@@ -93,10 +130,7 @@
 
         .guide-box strong { color: var(--accent); }
 
-        /* Formular Style */
-        .form-group {
-            margin-bottom: 12px;
-        }
+        .form-group { margin-bottom: 12px; }
 
         label {
             display: block;
@@ -123,8 +157,6 @@
             padding: 10px 15px;
             border-radius: 6px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
         }
 
         button:hover { background: var(--accent-hover); }
@@ -148,22 +180,29 @@
     <header>
         <div>
             <h1>eufyMake E1 Setup & Material Hub</h1>
-            <div class="subtitle">Profilverwaltung & Schritt-für-Schritt Anleitungen</div>
+            <div class="subtitle">Profilverwaltung & Live-Materialsuche</div>
         </div>
     </header>
 
-    <!-- HINWEIS & SCHNELL-REZEPTE -->
+    <!-- MATERIAL SUCHEN (WEB & LOKAL) -->
+    <div class="search-card">
+        <h2 style="margin-top:0; color:var(--accent); font-size: 1.2rem;">🔍 Material-Einstellungen suchen</h2>
+        <label>Gib ein Material ein (z. B. Acryl, Polystyrol, Edelstahl, Glas, Holz):</label>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Materialname eingeben..." oninput="filterProfiles()">
+            <button class="btn-google" onclick="searchWeb()">🌐 Im Netz suchen</button>
+        </div>
+    </div>
+
+    <!-- ANLEITUNGEN / REZEPTE -->
     <div class="grid">
-        
-        <!-- SPIEGEL-DRUCK (Durchsichtig / Effekt) -->
         <div class="card">
             <span class="badge badge-uv">UV-Druck</span>
             <h2>🪞 Spiegel (Teil-Transparent / Effekt)</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Ziel: Das Bild ist sichtbar, aber der Spiegel glänzt durch das Bild hindurch.</p>
-            
             <div class="param-group">
                 <div class="param-item">
-                    <div class="param-label">Weiß-Schicht (White Base)</div>
+                    <div class="param-label">Weiß-Schicht</div>
                     <div class="param-value" style="color: var(--warning);">DEAKTIVIERT / 0%</div>
                 </div>
                 <div class="param-item">
@@ -171,29 +210,23 @@
                     <div class="param-value">60% – 80%</div>
                 </div>
                 <div class="param-item">
-                    <div class="param-label">Passes / Auflösung</div>
+                    <div class="param-label">Passes / Qualität</div>
                     <div class="param-value">High Quality</div>
                 </div>
                 <div class="param-item">
-                    <div class="param-label">Primer / Haftung</div>
+                    <div class="param-label">Primer</div>
                     <div class="param-value">Glas-Primer (Tuch)</div>
                 </div>
             </div>
-
             <div class="guide-box">
-                <strong>Anleitung für den perfekten Spiegel-Effekt:</strong><br>
-                1. Spiegel gründlich mit Isopropanol und <strong>Glas-Primer</strong> reinigen (sonst platzt die UV-Tinte ab).<br>
-                2. <strong>Keinen weißen Untergrund drucken!</strong> Die UV-Farben sind ohne Weiß-Schicht leicht transparent. Licht wandert durch die Tinte, trifft auf das Glas und spiegelt zurück.<br>
-                3. Für glänzendes Finish: Eine Schicht <strong>Gloss / Varnish</strong> als Top-Coat wählen.
+                <strong>Anleitung:</strong> Isopropanol + Glas-Primer nutzen. Keinen weißen Untergrund drucken, damit der Spiegel hindurchscheint!
             </div>
         </div>
 
-        <!-- DUNKLE / TRANSPARENTE MATERIALIEN (Standard leuchtend) -->
         <div class="card">
             <span class="badge badge-uv">UV-Druck</span>
-            <h2>🎨 Dunkles / Transparentes Material (Hell & Kräftig)</h2>
+            <h2>🎨 Dunkles / Transparentes Material</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Ziel: Maximale Leuchtkraft auf Polystyrol, dunklem Acryl oder Holz.</p>
-            
             <div class="param-group">
                 <div class="param-item">
                     <div class="param-label">Druckmodus</div>
@@ -212,21 +245,16 @@
                     <div class="param-value">Stufe High</div>
                 </div>
             </div>
-
             <div class="guide-box">
-                <strong>Anleitung für leuchtende Farben:</strong><br>
-                1. <strong>Warum werden Bilder sonst dunkel?</strong> UV-Farbe ist ohne weiße Basis semitransparent. Auf dunklem Grund verschluckt der Hintergrund das Licht.<br>
-                2. Schalte in der Software zwingend <strong>"White Undercoat" (Weiß unterlegen)</strong> ein.<br>
-                3. Der Drucker druckt erst eine deckende weiße Schicht und direkt darüber CMYK. Dadurch strahlt das Motiv genau wie auf weißem Papier.
+                <strong>Anleitung:</strong> Aktiviere "White Undercoat" (100%), damit das Motiv strahlt und der dunkle Untergrund nicht durchscheint.
             </div>
         </div>
-
     </div>
 
     <!-- FORMULAR FÜR NEUE EINSTELLUNGEN -->
     <div class="grid">
         <div class="card" style="grid-column: 1 / -1;">
-            <h2>➕ Neues Material-Profil hinzufügen</h2>
+            <h2>➕ Neues Material-Profil speichern</h2>
             <form id="materialForm">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div class="form-group">
@@ -241,7 +269,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Weiß-Unterlegscheibe (White Ink)</label>
+                        <label>Weiß-Unterlegung (White Ink)</label>
                         <select id="whiteInk">
                             <option value="Aus (Transparent-Effekt)">Aus (Transparent-Effekt)</option>
                             <option value="100% Unterlegt (Vollfarbe)">100% Unterlegt (Vollfarbe)</option>
@@ -258,31 +286,41 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Besondere Hinweise & Tricks für perfektes Ergebnis</label>
-                    <textarea id="notes" rows="2" placeholder="z.B. Bei Spiegel erst Primer auftragen, trocknen lassen..."></textarea>
+                    <label>Besondere Hinweise & Tricks</label>
+                    <textarea id="notes" rows="2" placeholder="z.B. Erst reinigen, Trocknungszeit beachten..."></textarea>
                 </div>
-                <button type="submit">Material speichern</button>
+                <button type="submit" style="width:100%;">Material speichern</button>
             </form>
         </div>
     </div>
 
     <!-- SPEICHER-LISTE -->
-    <h2 style="color: var(--accent);">Saved Profiles</h2>
+    <h2 style="color: var(--accent);">Gespeicherte Profile</h2>
     <div class="grid" id="savedProfilesList">
-        <!-- Dynamsich erzeugte Profile landen hier -->
+        <!-- Dynamische Profile -->
     </div>
 </div>
 
 <script>
-    // Lokaler Speicher Logik
     const form = document.getElementById('materialForm');
     const container = document.getElementById('savedProfilesList');
+    const searchInput = document.getElementById('searchInput');
 
-    function loadProfiles() {
+    function loadProfiles(filterText = '') {
         const data = JSON.parse(localStorage.getItem('eufy_materials') || '[]');
         container.innerHTML = '';
         
-        data.forEach((item, index) => {
+        const filtered = data.filter(item => 
+            item.name.toLowerCase().includes(filterText.toLowerCase()) ||
+            item.notes.toLowerCase().includes(filterText.toLowerCase())
+        );
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Keine passenden gespeicherten Profile gefunden.</p>';
+            return;
+        }
+
+        filtered.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -307,6 +345,22 @@
             `;
             container.appendChild(card);
         });
+    }
+
+    // Web-Suche in neuem Tab öffnen
+    function searchWeb() {
+        const query = searchInput.value.trim();
+        if (!query) {
+            alert('Bitte gib zuerst ein Material in das Suchfeld ein!');
+            return;
+        }
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('eufyMake E1 UV Druck Einstellungen ' + query)}`;
+        window.open(googleUrl, '_blank');
+    }
+
+    // Lokale Filterung beim Tippen
+    function filterProfiles() {
+        loadProfiles(searchInput.value);
     }
 
     form.addEventListener('submit', (e) => {
@@ -334,7 +388,7 @@
         loadProfiles();
     }
 
-    // Beim Start laden
+    // Initial laden
     loadProfiles();
 </script>
 
