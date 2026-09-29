@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eufyMake E1 - Material & Druck-Profile</title>
+    <style>
+        :root {
+            --bg-color: #121418;
+            --card-bg: #1e222b;
+            --accent: #00d2ff;
+            --accent-hover: #0099cc;
+            --text-main: #f0f3f8;
+            --text-muted: #a0aab8;
+            --border: #2e3440;
+            --warning: #ff9f43;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; color: var(--accent); }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .param-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .param-item {
+            background: rgba(0,0,0,0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .param-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+        .param-value { font-size: 1rem; font-weight: bold; margin-top: 2px; }
+
+        .guide-box {
+            background: rgba(0, 210, 255, 0.05);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .guide-box strong { color: var(--accent); }
+
+        /* Formular Style */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            background: #15181e;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-main);
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--accent);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover { background: var(--accent-hover); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: var(--border);
+            margin-bottom: 10px;
+        }
+        .badge-uv { background: #6c5ce7; color: #fff; }
+        .badge-laser { background: #e17055; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>eufyMake E1 Setup & Material Hub</h1>
+            <div class="subtitle">Profilverwaltung & Schritt-für-Schritt Anleitungen</div>
+        </div>
+    </header>
+
+    <!-- HINWEIS & SCHNELL-REZEPTE -->
+    <div class="grid">
+        
+        <!-- SPIEGEL-DRUCK (Durchsichtig / Effekt) -->
+        <div class="card">
+            <span class="badge badge-uv">UV-Druck</span>
+            <h2>🪞 Spiegel (Teil-Transparent / Effekt)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Ziel: Das Bild ist sichtbar, aber der Spiegel glänzt durch das Bild hindurch.</p>
+            
+            <div class="param-group">
+                <div class="param-item">
+                    <div class="param-label">Weiß-Schicht (White Base)</div>
+                    <div class="param-value" style="color: var(--warning);">DEAKTIVIERT / 0%</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-label">CMYK Tintenmenge</div>
+                    <div class="param-value">60% – 80%</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-label">Passes / Auflösung</div>
+                    <div class="param-value">High Quality</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-label">Primer / Haftung</div>
+                    <div class="param-value">Glas-Primer (Tuch)</div>
+                </div>
+            </div>
+
+            <div class="guide-box">
+                <strong>Anleitung für den perfekten Spiegel-Effekt:</strong><br>
+                1. Spiegel gründlich mit Isopropanol und <strong>Glas-Primer</strong> reinigen (sonst platzt die UV-Tinte ab).<br>
+                2. <strong>Keinen weißen Untergrund drucken!</strong> Die UV-Farben sind ohne Weiß-Schicht leicht transparent. Licht wandert durch die Tinte, trifft auf das Glas und spiegelt zurück.<br>
+                3. Für glänzendes Finish: Eine Schicht <strong>Gloss / Varnish</strong> als Top-Coat wählen.
+            </div>
+        </div>
+
+        <!-- DUNKLE / TRANSPARENTE MATERIALIEN (Standard leuchtend) -->
+        <div class="card">
+            <span class="badge badge-uv">UV-Druck</span>
+            <h2>🎨 Dunkles / Transparentes Material (Hell & Kräftig)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Ziel: Maximale Leuchtkraft auf Polystyrol, dunklem Acryl oder Holz.</p>
+            
+            <div class="param-group">
+                <div class="param-item">
+                    <div class="param-label">Druckmodus</div>
+                    <div class="param-value">W + CMYK</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-label">Weiß-Deckung</div>
+                    <div class="param-value">100% (Unterlegen)</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-label">CMYK Dichte</div>
+                    <div class="param-value">100%</div>
+                </div>
+                <div class="param-item">
+                    <div class="param-label">UV-Aushärtung</div>
+                    <div class="param-value">Stufe High</div>
+                </div>
+            </div>
+
+            <div class="guide-box">
+                <strong>Anleitung für leuchtende Farben:</strong><br>
+                1. <strong>Warum werden Bilder sonst dunkel?</strong> UV-Farbe ist ohne weiße Basis semitransparent. Auf dunklem Grund verschluckt der Hintergrund das Licht.<br>
+                2. Schalte in der Software zwingend <strong>"White Undercoat" (Weiß unterlegen)</strong> ein.<br>
+                3. Der Drucker druckt erst eine deckende weiße Schicht und direkt darüber CMYK. Dadurch strahlt das Motiv genau wie auf weißem Papier.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FORMULAR FÜR NEUE EINSTELLUNGEN -->
+    <div class="grid">
+        <div class="card" style="grid-column: 1 / -1;">
+            <h2>➕ Neues Material-Profil hinzufügen</h2>
+            <form id="materialForm">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="form-group">
+                        <label>Material Name</label>
+                        <input type="text" id="matName" placeholder="z.B. Polystyrol Schwarz 3mm" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Typ</label>
+                        <select id="matType">
+                            <option value="UV-Druck">UV-Druck</option>
+                            <option value="Laser">Laser-Gravur/Schnitt</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Weiß-Unterlegscheibe (White Ink)</label>
+                        <select id="whiteInk">
+                            <option value="Aus (Transparent-Effekt)">Aus (Transparent-Effekt)</option>
+                            <option value="100% Unterlegt (Vollfarbe)">100% Unterlegt (Vollfarbe)</option>
+                            <option value="Nur weiße Bereiche">Nur weiße Bereiche</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vorbehandlung / Primer</label>
+                        <input type="text" id="primer" placeholder="z.B. Kunststoff-Primer / Isopropanol">
+                    </div>
+                    <div class="form-group">
+                        <label>Passes / Qualität</label>
+                        <input type="text" id="quality" placeholder="z.B. 8 Pass / High Quality">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Besondere Hinweise & Tricks für perfektes Ergebnis</label>
+                    <textarea id="notes" rows="2" placeholder="z.B. Bei Spiegel erst Primer auftragen, trocknen lassen..."></textarea>
+                </div>
+                <button type="submit">Material speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SPEICHER-LISTE -->
+    <h2 style="color: var(--accent);">Saved Profiles</h2>
+    <div class="grid" id="savedProfilesList">
+        <!-- Dynamsich erzeugte Profile landen hier -->
+    </div>
+</div>
+
+<script>
+    // Lokaler Speicher Logik
+    const form = document.getElementById('materialForm');
+    const container = document.getElementById('savedProfilesList');
+
+    function loadProfiles() {
+        const data = JSON.parse(localStorage.getItem('eufy_materials') || '[]');
+        container.innerHTML = '';
+        
+        data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <span class="badge ${item.type === 'UV-Druck' ? 'badge-uv' : 'badge-laser'}">${item.type}</span>
+                <button onclick="deleteProfile(${index})" style="float:right; width:auto; padding:2px 8px; background:#e74c3c; color:#fff;">X</button>
+                <h2>${item.name}</h2>
+                <div class="param-group">
+                    <div class="param-item">
+                        <div class="param-label">Weiß-Schicht</div>
+                        <div class="param-value">${item.whiteInk}</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-label">Primer</div>
+                        <div class="param-value">${item.primer || 'Keiner'}</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-label">Qualität</div>
+                        <div class="param-value">${item.quality || 'Standard'}</div>
+                    </div>
+                </div>
+                <div class="guide-box">${item.notes || 'Keine Notizen.'}</div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const profiles = JSON.parse(localStorage.getItem('eufy_materials') || '[]');
+        
+        profiles.push({
+            name: document.getElementById('matName').value,
+            type: document.getElementById('matType').value,
+            whiteInk: document.getElementById('whiteInk').value,
+            primer: document.getElementById('primer').value,
+            quality: document.getElementById('quality').value,
+            notes: document.getElementById('notes').value
+        });
+
+        localStorage.setItem('eufy_materials', JSON.stringify(profiles));
+        form.reset();
+        loadProfiles();
+    });
+
+    function deleteProfile(index) {
+        const profiles = JSON.parse(localStorage.getItem('eufy_materials') || '[]');
+        profiles.splice(index, 1);
+        localStorage.setItem('eufy_materials', JSON.stringify(profiles));
+        loadProfiles();
+    }
+
+    // Beim Start laden
+    loadProfiles();
+</script>
+
+</body>
+</html>
