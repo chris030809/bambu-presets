@@ -120,6 +120,7 @@
             padding: 16px;
             border: 1px solid var(--border-color);
             border-left: 5px solid var(--accent);
+            transition: opacity 0.3s ease;
         }
 
         .card.support-card {
@@ -128,6 +129,10 @@
 
         .card.firstlayer-card {
             border-left-color: var(--accent-holo);
+        }
+
+        .card.disabled-card {
+            opacity: 0.4;
         }
 
         .card h3 {
@@ -281,6 +286,7 @@
         <div class="form-group">
             <label for="supportMaterial">Support / Trennschicht Material</label>
             <select id="supportMaterial" onchange="updateSettings()">
+                <option value="none">Kein Support benötigt (Deaktiviert)</option>
                 <option value="same" selected>Gleiches Material (Schnittstelle mit Hauptmaterial)</option>
                 <option value="support_pla">Bambu Support for PLA (Dedicated Interface)</option>
                 <option value="support_petg">Bambu Support for PETG / ABS</option>
@@ -314,7 +320,7 @@
         </div>
 
         <!-- Professional Support Card -->
-        <div class="card support-card">
+        <div class="card support-card" id="supportCard">
             <h3>Support & Trennschicht (Pro Settings)</h3>
             <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Slim / Auto)</span></div>
             <div class="setting-row"><span class="setting-label">Schnittstellen Extruder:</span><span class="setting-value" id="supportExtruder">T2 (Support-Düsenkopf)</span></div>
@@ -324,7 +330,6 @@
             <div class="setting-row"><span class="setting-label">Schnittstellen-Muster:</span><span class="setting-value" id="supportPattern">Concentric / Rectangular</span></div>
             <div class="setting-row"><span class="setting-label">Schnittstellen-Abstand:</span><span class="setting-value" id="supportSpacing">0.0 mm (Dicht)</span></div>
             <div class="setting-row"><span class="setting-label">XY-Abstand zur Wand:</span><span class="setting-value" id="supportXYDistance">0.35 mm</span></div>
-            <div class="setting-row"><span class="setting-label">Schwellenwinkel (Threshold):</span><span class="setting-value" id="supportAngle">30°</span></div>
         </div>
 
         <div class="card">
@@ -338,6 +343,7 @@
 
         <div class="card">
             <h3>Wände & Infill-Geometrie</h3>
+            <div class="setting-row"><span class="setting-label">Schichthöhe (Layer Height):</span><span class="setting-value" id="layerHeight">0.20 mm</span></div>
             <div class="setting-row"><span class="setting-label">Wandlinien:</span><span class="setting-value" id="wallLoops">-</span></div>
             <div class="setting-row"><span class="setting-label">Wand-Reihenfolge:</span><span class="setting-value" id="wallOrder">-</span></div>
             <div class="setting-row"><span class="setting-label">Top / Bottom:</span><span class="setting-value" id="topBottomLayers">-</span></div>
@@ -481,7 +487,7 @@ function updateSettings() {
 
     if (buildPlate === "holo") {
         plateName = "Holo / PEO / PED (Effekt-Platte)";
-        bedTempFinal = mat.bed[0] + 5; // Erhöht die Haftung für den Mikrostruktur-Transfer
+        bedTempFinal = mat.bed[0] + 5;
         flWidth = "0.52 mm (Presst voll in die Hologramm-Struktur)";
         flFlowCalc = (calcFlow * 1.05).toFixed(2) + " (+5% Extra-Druck für Spiegeleffekt)";
         eleComp = "0.08 mm (Minimiert Wulst für flachen Effekt)";
@@ -513,43 +519,61 @@ function updateSettings() {
     document.getElementById("flBedTemp").innerText = bedTempFinal + "°C";
 
     // SUPPORT LOGIK
+    const supportCard = document.getElementById("supportCard");
     let zDist = mat.defaultZ;
     let bZDist = mat.defaultZ;
     let interLayers = "3 Schichten";
     let interPattern = "Concentric";
     let interSpacing = "0.20 mm";
     let extText = "T1 (Gleicher Kopf)";
+    let suppType = "Tree (Slim / Auto)";
     let suppNote = "";
 
-    if (printer === "H2D") {
-        extText = "T2 (2. Extruder-Düse)";
-    } else if (printer === "P1S") {
-        extText = "AMS Slot (Multimaterial)";
-    }
-
-    if (suppMat !== "same") {
-        zDist = "0.00 mm (Perfekte Unterseite!)";
-        bZDist = "0.00 mm";
-        interLayers = "3 - 4 Schichten";
-        interPattern = "Rectangular / Concentric";
-        interSpacing = "0.00 mm (Vollflächig)";
-        suppNote = "Spezial-Support / Trennschicht aktiv! Dank 0.00mm Z-Abstand wird die Unterseite spiegelglatt. ";
+    if (suppMat === "none") {
+        supportCard.classList.add("disabled-card");
+        suppType = "Aus (Kein Support)";
+        extText = "Keiner";
+        zDist = "-";
+        bZDist = "-";
+        interLayers = "-";
+        interPattern = "-";
+        interSpacing = "-";
+        document.getElementById("supportXYDistance").innerText = "-";
+        suppNote = "Support ist deaktiviert. Achte darauf, dass das Modell keine Überhänge über 45° hat. ";
     } else {
-        zDist = mat.defaultZ;
-        bZDist = mat.defaultZ;
-        interLayers = "2 Schichten";
-        interPattern = "Rectangular Grid";
-        interSpacing = "0.50 mm";
-        suppNote = "Monomaterial Support: Z-Abstand auf " + zDist + " gesetzt für einfaches Abbrechen. ";
+        supportCard.classList.remove("disabled-card");
+
+        if (printer === "H2D") {
+            extText = "T2 (2. Extruder-Düse)";
+        } else if (printer === "P1S") {
+            extText = "AMS Slot (Multimaterial)";
+        }
+
+        if (suppMat !== "same") {
+            zDist = "0.00 mm (Perfekte Unterseite!)";
+            bZDist = "0.00 mm";
+            interLayers = "3 - 4 Schichten";
+            interPattern = "Rectangular / Concentric";
+            interSpacing = "0.00 mm (Vollflächig)";
+            suppNote = "Spezial-Support / Trennschicht aktiv! Dank 0.00mm Z-Abstand wird die Unterseite spiegelglatt. ";
+        } else {
+            zDist = mat.defaultZ;
+            bZDist = mat.defaultZ;
+            interLayers = "2 Schichten";
+            interPattern = "Rectangular Grid";
+            interSpacing = "0.50 mm";
+            suppNote = "Monomaterial Support: Z-Abstand auf " + zDist + " gesetzt für einfaches Abbrechen. ";
+        }
+        document.getElementById("supportXYDistance").innerText = purpose === "detail" ? "0.40 mm" : "0.35 mm";
     }
 
+    document.getElementById("supportType").innerText = suppType;
     document.getElementById("supportZDistance").innerText = zDist;
     document.getElementById("supportBottomZ").innerText = bZDist;
     document.getElementById("supportInterface").innerText = interLayers;
     document.getElementById("supportPattern").innerText = interPattern;
     document.getElementById("supportSpacing").innerText = interSpacing;
     document.getElementById("supportExtruder").innerText = suppMat === "same" ? "T1 (Haupt-Düse)" : extText;
-    document.getElementById("supportXYDistance").innerText = purpose === "detail" ? "0.40 mm" : "0.35 mm";
 
     // ZWECK, GEOMETRIE & HIGH-FLOW GESCHWINDIGKEITEN
     let baseOuter = 120;
@@ -577,7 +601,7 @@ function updateSettings() {
         document.getElementById("ironing").innerText = "An (Top Surfaces)";
         document.getElementById("layerHeight").innerText = "0.08 - 0.12 mm";
         baseOuter = 70; baseInner = 120; baseInfill = 180; baseTop = 60;
-        suppNote += "Gyroid verhindert Resonanzstreifen & Ghosting. Tree-Support nutzen.";
+        suppNote += "Gyroid verhindert Resonanzstreifen & Ghosting. Falls benötigt, Tree-Support nutzen.";
 
     } else if (purpose === "thinwall") {
         document.getElementById("wallLoops").innerText = "2 - 3 Linien";
