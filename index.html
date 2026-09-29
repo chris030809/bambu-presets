@@ -633,7 +633,7 @@
           <input type="number" id="filamentCostKg" value="20.00" step="0.5" oninput="calculate()">
         </div>
         <div class="form-group">
-          <label for="powerWatts">Strom Ø (Watt)</label>
+          <label for="powerWatts">Strom Ø 3D (Watt)</label>
           <input type="number" id="powerWatts" value="350" step="10" oninput="calculate()">
         </div>
       </div>
@@ -651,6 +651,7 @@
 
       <hr style="border-color: var(--card-border); margin: 12px 0;">
 
+      <!-- UV Tintenpreise & Verbrauchs-Parameter (Editierbar) -->
       <div class="row">
         <div class="form-group">
           <label for="uvCmyk">CMYK Tinte (ml)</label>
@@ -664,12 +665,34 @@
 
       <div class="row">
         <div class="form-group">
-          <label for="uvInkCostMl">Tintenpreis (€/ml)</label>
-          <input type="number" id="uvInkCostMl" value="0.12" step="0.01" oninput="calculate()">
+          <label for="uvCmykCostMl">CMYK Preis (€/ml)</label>
+          <input type="number" id="uvCmykCostMl" value="0.30" step="0.01" oninput="calculate()">
         </div>
+        <div class="form-group">
+          <label for="uvWhiteCostMl">Weiß/Gloss Preis (€/ml)</label>
+          <input type="number" id="uvWhiteCostMl" value="0.30" step="0.01" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="uvPrintMinutes">UV Druckzeit (Min.)</label>
+          <input type="number" id="uvPrintMinutes" value="5.0" step="0.5" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="spuelZuschlag">Spül-/Reinigungsaufschlag (%)</label>
+          <input type="number" id="spuelZuschlag" value="20" step="1" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="row">
         <div class="form-group">
           <label for="blankCost">Rohling / Canvas (€)</label>
           <input type="number" id="blankCost" value="1.50" step="0.05" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="elecPrice">Strompreis (€/kWh)</label>
+          <input type="number" id="elecPrice" value="0.35" step="0.01" oninput="calculate()">
         </div>
       </div>
 
@@ -682,11 +705,6 @@
           <label for="laborRate">Stundenlohn (€/h)</label>
           <input type="number" id="laborRate" value="30.00" step="1" oninput="calculate()">
         </div>
-      </div>
-
-      <div class="form-group">
-        <label for="elecPrice">Strompreis (€/kWh)</label>
-        <input type="number" id="elecPrice" value="0.38" step="0.01" oninput="calculate()">
       </div>
     </div>
 
@@ -702,12 +720,20 @@
         <span id="resPower">0,00 €</span>
       </div>
       <div class="result-row">
-        <span>Drucker-Verschleiß:</span>
+        <span>Drucker-Verschleiß (3D):</span>
         <span id="resWear">0,00 €</span>
       </div>
       <div class="result-row">
-        <span>UV-Tinte & Rohling:</span>
-        <span id="resUv">0,00 €</span>
+        <span>UV-Tinte (inkl. Spülung):</span>
+        <span id="resUvInk">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>UV-Strom (66W eufy E1):</span>
+        <span id="resUvPower">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>Rohling / Werkstück:</span>
+        <span id="resBlank">0,00 €</span>
       </div>
       <div class="result-row">
         <span>Arbeitskosten:</span>
@@ -792,7 +818,6 @@
       fitSelect.value = "cut_assembly";
     }
 
-    // 3MF Objekt-Inspektion durchführen
     if (fname.endsWith(".3mf")) {
       inspect3mfFile(file);
     } else {
@@ -818,7 +843,6 @@
       let html = `<div class="tree-item">📁 <strong>${file.name}</strong></div>`;
       let foundObjects = [];
 
-      // Suche nach Bambu Studio / Slicer spezifischen Modelldateien
       let sliceDataFiles = Object.keys(zip.files).filter(f => f.startsWith('3D/') || f.endsWith('.model') || f.includes('plate'));
 
       zip.forEach((relativePath, zipEntry) => {
@@ -955,7 +979,7 @@
     document.getElementById("supInterface").innerText = interfaceLayers;
     document.getElementById("supType").innerText = supTypeVal;
 
-    // Geschwindigkeiten erweitern
+    // Geschwindigkeiten
     let baseOuter = 120, baseInner = 200, baseInfill = 270, baseTop = 120;
     if (purpose === "detail") { baseOuter = 70; baseInner = 120; baseInfill = 180; baseTop = 80; }
     else if (purpose === "functional") { baseOuter = 110; baseInner = 180; baseInfill = 250; baseTop = 110; }
@@ -1112,22 +1136,33 @@
     const costPower = (powerWatts / 1000) * printHours * elecPrice;
     const costWear = (printerPrice / printerLifespan) * printHours;
 
+    // UV Tinten- und Stromberechnung
     const uvCmyk = parseFloat(document.getElementById('uvCmyk').value) || 0;
     const uvWhiteGloss = parseFloat(document.getElementById('uvWhiteGloss').value) || 0;
-    const uvInkCostMl = parseFloat(document.getElementById('uvInkCostMl').value) || 0;
+    const uvCmykCostMl = parseFloat(document.getElementById('uvCmykCostMl').value) || 0;
+    const uvWhiteCostMl = parseFloat(document.getElementById('uvWhiteCostMl').value) || 0;
+    const uvPrintMinutes = parseFloat(document.getElementById('uvPrintMinutes').value) || 0;
+    const spuelZuschlag = parseFloat(document.getElementById('spuelZuschlag').value) || 0;
     const blankCost = parseFloat(document.getElementById('blankCost').value) || 0;
 
     let costUvInk = 0;
+    let costUvPower = 0;
+
     if (enableUv) {
-      costUvInk = (uvCmyk + uvWhiteGloss) * uvInkCostMl;
+      // Reine Tintenkosten
+      const rawInkCost = (uvCmyk * uvCmykCostMl) + (uvWhiteGloss * uvWhiteCostMl);
+      // Tintenkosten inkl. Spülungsaufschlag
+      costUvInk = rawInkCost * (1 + spuelZuschlag / 100);
+
+      // eufyMake E1 Stromberechnung (66 Watt Betrieb = 0.066 kW)
+      costUvPower = (uvPrintMinutes / 60) * 0.066 * elecPrice;
     }
-    const costUvTotal = costUvInk + blankCost;
 
     const laborMinutes = parseFloat(document.getElementById('laborMinutes').value) || 0;
     const laborRate = parseFloat(document.getElementById('laborRate').value) || 0;
     const costLabor = (laborMinutes / 60) * laborRate;
 
-    const totalCost = costFilament + costPower + costWear + costUvTotal + costLabor;
+    const totalCost = costFilament + costPower + costWear + costUvInk + costUvPower + blankCost + costLabor;
 
     const marginPercent = parseFloat(document.getElementById('marginPercent').value) || 0;
     const netSell = totalCost * (1 + marginPercent / 100);
@@ -1151,7 +1186,9 @@
     document.getElementById('resFilament').innerText = costFilament.toFixed(2) + ' €';
     document.getElementById('resPower').innerText = costPower.toFixed(2) + ' €';
     document.getElementById('resWear').innerText = costWear.toFixed(2) + ' €';
-    document.getElementById('resUv').innerText = costUvTotal.toFixed(2) + ' €';
+    document.getElementById('resUvInk').innerText = costUvInk.toFixed(3).replace('.', ',') + ' €';
+    document.getElementById('resUvPower').innerText = costUvPower.toFixed(4).replace('.', ',') + ' €';
+    document.getElementById('resBlank').innerText = blankCost.toFixed(2) + ' €';
     document.getElementById('resLabor').innerText = costLabor.toFixed(2) + ' €';
     document.getElementById('resTotalCost').innerText = totalCost.toFixed(2) + ' €';
 
