@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Bambu Slicer & eufyMake E1 UV Master Tool</title>
+  <title>Bambu Slicer & eufyMake E1 Master Tool</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -71,6 +71,7 @@
     }
 
     .section-title.print3d { color: var(--accent-3d); border-bottom-color: var(--accent-3d); }
+    .section-title.precision { color: var(--accent-warn); border-bottom-color: var(--accent-warn); }
     .section-title.uv { color: var(--accent-uv); border-bottom-color: var(--accent-uv); }
     .section-title.calc { color: var(--accent-green); border-bottom-color: var(--accent-green); }
 
@@ -136,6 +137,7 @@
     }
 
     .card.print3d-card h3 { color: var(--accent-3d); }
+    .card.precision-card h3 { color: var(--accent-warn); }
     .card.uv-card h3 { color: var(--accent-uv); }
     .card.calc-card h3 { color: var(--accent-green); }
 
@@ -240,6 +242,11 @@
       font-size: 0.88rem;
     }
 
+    .tip-box.precision-tip {
+      background-color: #38240b;
+      border-color: #78350f;
+    }
+
     .tip-box.uv-tip {
       background-color: #27173a;
       border-color: #52277a;
@@ -249,6 +256,10 @@
       display: block;
       margin-bottom: 4px;
       color: var(--accent-3d);
+    }
+
+    .tip-box.precision-tip strong {
+      color: var(--accent-warn);
     }
 
     .tip-box.uv-tip strong {
@@ -272,7 +283,7 @@
 <div class="container">
   <header>
     <h1>Bambu Slicer & eufyMake E1 Master Tool</h1>
-    <p class="subtitle">Slicer-Optimierung, UV-Druck Setup & Vollständige Gewerbekalkulation</p>
+    <p class="subtitle">Slicer-Optimierung, Passgenauigkeit (Ironing/Toleranzen), UV-Druck & Vollständige Kalkulation</p>
   </header>
 
   <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
@@ -295,7 +306,7 @@
   </div>
 
   <!-- SECTION 1: 3D DRUCK PARAMETRIERUNG -->
-  <div class="section-title print3d">🖨️ 1. 3D-Druck Einstellungen & Slicer</div>
+  <div class="section-title print3d">🖨️ 1. 3D-Druck Einstellungen & Slicer Basis</div>
   <div class="grid">
     <div class="card print3d-card">
       <h3>Drucker & Material</h3>
@@ -326,14 +337,6 @@
             <option value="smooth_pei">Smooth PEI / High Temp</option>
             <option value="textured_pei">Textured PEI Plate</option>
             <option value="cool_plate">Bambu Cool Plate</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="eleFootToggle">Elefantenfuß-Komp.</label>
-          <select id="eleFootToggle" onchange="calculate()">
-            <option value="on" selected>Ein (Aktiviert)</option>
-            <option value="off">Aus (Deaktiviert)</option>
           </select>
         </div>
 
@@ -372,19 +375,19 @@
             <option value="thinwall">Dünnwandig / Gehäuse</option>
           </select>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="supportMaterial">Support / Trennschicht</label>
-        <select id="supportMaterial" onchange="calculate()">
-          <option value="none">Kein Support benötigt</option>
-          <option value="same" selected>Gleiches Material (Schnittstelle)</option>
-          <option value="support_pla">Bambu Support for PLA</option>
-          <option value="support_petg">Bambu Support for PETG / ABS</option>
-          <option value="pva">PVA / BVOH (Wasserlöslich)</option>
-          <option value="petg_for_pla">PETG als Trennschicht für PLA</option>
-          <option value="pla_for_petg">PLA als Trennschicht für PETG</option>
-        </select>
+        <div class="form-group">
+          <label for="supportMaterial">Support / Trennschicht</label>
+          <select id="supportMaterial" onchange="calculate()">
+            <option value="none">Kein Support benötigt</option>
+            <option value="same" selected>Gleiches Material (Schnittstelle)</option>
+            <option value="support_pla">Bambu Support for PLA</option>
+            <option value="support_petg">Bambu Support for PETG / ABS</option>
+            <option value="pva">PVA / BVOH (Wasserlöslich)</option>
+            <option value="petg_for_pla">PETG als Trennschicht für PLA</option>
+            <option value="pla_for_petg">PLA als Trennschicht für PETG</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -396,7 +399,6 @@
       <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
       <div class="setting-row"><span class="setting-label">Flow Ratio:</span><span class="setting-value" id="flowRatio">-</span></div>
       <div class="setting-row"><span class="setting-label">1. Layer Linienbreite:</span><span class="setting-value" id="flLineWidth">-</span></div>
-      <div class="setting-row"><span class="setting-label">Elefantenfuß Komp.:</span><span class="setting-value" id="eleFootComp">-</span></div>
       <div class="setting-row"><span class="setting-label">Außenwand Speed:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
       <div class="setting-row"><span class="setting-label">Infill Speed:</span><span class="setting-value" id="infillSpeed">-</span></div>
       <div class="setting-row"><span class="setting-label">Gehäuse/Tür:</span><span class="setting-value" id="chamberTip">-</span></div>
@@ -406,21 +408,87 @@
         <span id="geometryNote">-</span>
       </div>
     </div>
+  </div>
 
-    <!-- Support Details Card -->
-    <div class="card print3d-card" id="supportCard">
-      <h3>Support & Schnittstellen Parameter</h3>
-      <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Slim / Auto)</span></div>
-      <div class="setting-row"><span class="setting-label">Schnittstellen Extruder:</span><span class="setting-value" id="supportExtruder">T2</span></div>
-      <div class="setting-row"><span class="setting-label">Top Z-Abstand:</span><span class="setting-value" id="supportZDistance">0.20 mm</span></div>
-      <div class="setting-row"><span class="setting-label">Bottom Z-Abstand:</span><span class="setting-value" id="supportBottomZ">0.20 mm</span></div>
-      <div class="setting-row"><span class="setting-label">Schnittstellen-Schichten:</span><span class="setting-value" id="supportInterface">2 Schichten</span></div>
-      <div class="setting-row"><span class="setting-label">Schnittstellen-Muster:</span><span class="setting-value" id="supportPattern">Concentric</span></div>
+  <!-- SECTION 2: PASSGENAUIGKEIT, TOLERANZEN & GLÄTTEN (IRONING) -->
+  <div class="section-title precision">📏 2. Passgenauigkeit, Toleranzen & Oberflächen (Glätten / Ironing)</div>
+  <div class="grid">
+    <div class="card precision-card">
+      <h3>Passungs- & Glättungs-Einstellungen</h3>
+      
+      <div class="form-group">
+        <label for="fitType">Verbindungs-Art / Schnitt</label>
+        <select id="fitType" onchange="calculate()">
+          <option value="none">Standarddruck (Keine Passung erforderlich)</option>
+          <option value="pressfit" selected>Presspassung (Fester Sitz / Stecken)</option>
+          <option value="sliding">Schiebesitz / Beweglich (Lager, Führungen)</option>
+          <option value="cut_assembly">Schnitt-Baugruppe / Multi-Part Schnitt</option>
+        </select>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="eleFootToggle">Elefantenfuß-Komp.</label>
+          <select id="eleFootToggle" onchange="calculate()">
+            <option value="on" selected>Ein (Aktiviert)</option>
+            <option value="off">Aus (Deaktiviert)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sliceTolerance">Slicing Tolerance</label>
+          <select id="sliceTolerance" onchange="calculate()">
+            <option value="middle" selected>Middle (Standard)</option>
+            <option value="exclusive">Exclusive (Garantiert freigängig)</option>
+            <option value="inclusive">Inclusive (Eng / Stramm)</option>
+          </select>
+        </div>
+      </div>
+
+      <hr style="border-color: var(--card-border); margin: 12px 0;">
+
+      <div class="form-group">
+        <label for="ironingMode">Glätten / Ironing Modus</label>
+        <select id="ironingMode" onchange="calculate()">
+          <option value="off" selected>Deaktiviert</option>
+          <option value="top">Nur oberste Schichten (Top Surfaces Only)</option>
+          <option value="all">Alle Oberflächen (All Top Surfaces)</option>
+        </select>
+      </div>
+
+      <div id="ironingControls" class="disabled-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="ironingFlow">Ironing Flow (%)</label>
+            <input type="number" id="ironingFlow" value="15" step="1" oninput="calculate()">
+          </div>
+          <div class="form-group">
+            <label for="ironingSpeed">Ironing Speed (mm/s)</label>
+            <input type="number" id="ironingSpeed" value="30" step="5" oninput="calculate()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Precision Output Card -->
+    <div class="card precision-card">
+      <h3>Empfohlene Korrekturwerte (Bambu Studio)</h3>
+      <div class="setting-row"><span class="setting-label">XY Hole Compensation (Löcher):</span><span class="setting-value" id="xyHoleComp">0.00 mm</span></div>
+      <div class="setting-row"><span class="setting-label">XY Contour Comp. (Außenmaß):</span><span class="setting-value" id="xyContourComp">0.00 mm</span></div>
+      <div class="setting-row"><span class="setting-label">Elefantenfuß Kompensation:</span><span class="setting-value" id="eleFootComp">0.15 mm</span></div>
+      <div class="setting-row"><span class="setting-label">Slicing Toleranz Modus:</span><span class="setting-value" id="sliceTolResult">Middle</span></div>
+      <div class="setting-row"><span class="setting-label">Ironing Flow / Speed:</span><span class="setting-value" id="ironingResult">Aus</span></div>
+      <div class="setting-row"><span class="setting-label">Ironing Linienabstand:</span><span class="setting-value" id="ironingSpacing">0.15 mm</span></div>
+
+      <div class="tip-box precision-tip">
+        <strong>Toleranz- & Passungs-Tipp:</strong>
+        <span id="precisionNote">-</span>
+      </div>
     </div>
   </div>
 
-  <!-- SECTION 2: EUFYMAKE E1 UV-DRUCK SETTINGS -->
-  <div class="section-title uv">🎨 2. eufyMake E1 UV-Druck Einstellungen</div>
+  <!-- SECTION 3: EUFYMAKE E1 UV-DRUCK SETTINGS -->
+  <div class="section-title uv">🎨 3. eufyMake E1 UV-Druck Einstellungen</div>
   <div class="grid">
     <div class="card uv-card">
       <h3>UV Werkstück & Effekt</h3>
@@ -488,8 +556,8 @@
     </div>
   </div>
 
-  <!-- SECTION 3: GEWERBE-KOSTENRECHNER -->
-  <div class="section-title calc">💰 3. Gewerbe-Kostenrechner (Verkauf & Selbstkosten)</div>
+  <!-- SECTION 4: GEWERBE-KOSTENRECHNER -->
+  <div class="section-title calc">💰 4. Gewerbe-Kostenrechner (Verkauf & Selbstkosten)</div>
   <div class="grid">
     <!-- Eingaben Kosten & Aufwand -->
     <div class="card calc-card">
@@ -638,15 +706,15 @@
 
 <script>
   const matDatabase = {
-    "PLA":      { nozzle: [210, 220], bed: [55, 65],  flow: 0.98, vol: 21, defaultZ: "0.20 mm", hardNozzle: false },
-    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  flow: 0.98, vol: 18, defaultZ: "0.20 mm", hardNozzle: true },
-    "PETG":     { nozzle: [235, 250], bed: [70, 80],  flow: 0.95, vol: 13, defaultZ: "0.24 mm", hardNozzle: false },
-    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  flow: 0.95, vol: 12, defaultZ: "0.24 mm", hardNozzle: true },
-    "ABS":      { nozzle: [245, 265], bed: [90, 100], flow: 0.95, vol: 16, defaultZ: "0.20 mm", hardNozzle: false },
-    "ASA":      { nozzle: [250, 270], bed: [95, 105], flow: 0.95, vol: 15, defaultZ: "0.20 mm", hardNozzle: false },
-    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], flow: 0.95, vol: 14, defaultZ: "0.22 mm", hardNozzle: true },
-    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], flow: 0.96, vol: 10, defaultZ: "0.25 mm", hardNozzle: true },
-    "TPU":      { nozzle: [220, 235], bed: [30, 45],  flow: 1.00, vol: 3.5, defaultZ: "0.20 mm", hardNozzle: false }
+    "PLA":      { nozzle: [210, 220], bed: [55, 65],  flow: 0.98, vol: 21, defaultZ: "0.20 mm", hardNozzle: false, shrink: 0.002 },
+    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  flow: 0.98, vol: 18, defaultZ: "0.20 mm", hardNozzle: true,  shrink: 0.001 },
+    "PETG":     { nozzle: [235, 250], bed: [70, 80],  flow: 0.95, vol: 13, defaultZ: "0.24 mm", hardNozzle: false, shrink: 0.005 },
+    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  flow: 0.95, vol: 12, defaultZ: "0.24 mm", hardNozzle: true,  shrink: 0.003 },
+    "ABS":      { nozzle: [245, 265], bed: [90, 100], flow: 0.95, vol: 16, defaultZ: "0.20 mm", hardNozzle: false, shrink: 0.008 },
+    "ASA":      { nozzle: [250, 270], bed: [95, 105], flow: 0.95, vol: 15, defaultZ: "0.20 mm", hardNozzle: false, shrink: 0.007 },
+    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], flow: 0.95, vol: 14, defaultZ: "0.22 mm", hardNozzle: true,  shrink: 0.004 },
+    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], flow: 0.96, vol: 10, defaultZ: "0.25 mm", hardNozzle: true,  shrink: 0.005 },
+    "TPU":      { nozzle: [220, 235], bed: [30, 45],  flow: 1.00, vol: 3.5, defaultZ: "0.20 mm", hardNozzle: false, shrink: 0.012 }
   };
 
   const brandOffsets = {
@@ -665,12 +733,15 @@
     document.getElementById('fileNameDisplay').innerText = "Analyse: " + file.name;
 
     const purposeSelect = document.getElementById("purpose");
+    const fitSelect = document.getElementById("fitType");
+
     if (fname.includes("statue") || fname.includes("figure") || fname.includes("bust")) {
       purposeSelect.value = "detail";
     } else if (fname.includes("gear") || fname.includes("mount") || fname.includes("bracket")) {
       purposeSelect.value = "functional";
-    } else if (fname.includes("box") || fname.includes("case") || fname.includes("thin")) {
-      purposeSelect.value = "thinwall";
+      fitSelect.value = "pressfit";
+    } else if (fname.includes("cut") || fname.includes("split") || fname.includes("joint")) {
+      fitSelect.value = "cut_assembly";
     }
     calculate();
   }
@@ -713,11 +784,10 @@
   }
 
   function calculate() {
-    // 1. 3D SLICER PARAMETER
+    // 1. 3D SLICER BASIS
     const printerVal = document.getElementById("printerSelect").value;
     const nozzleType = document.getElementById("nozzleType").value;
     const buildPlate = document.getElementById("buildPlate").value;
-    const eleFootToggle = document.getElementById("eleFootToggle").value;
     const brand = document.getElementById("brand").value;
     const material = document.getElementById("material").value;
     const suppMat = document.getElementById("supportMaterial").value;
@@ -764,41 +834,61 @@
       document.getElementById("chamberTip").innerText = "Geschlossen";
     }
 
-    // Elefantenfuß & Druckplatte
-    let flWidth = "0.50 mm";
-    let eleCompVal = "0.00 mm (Deaktiviert)";
-    if (eleFootToggle === "on") {
-      eleCompVal = buildPlate === "holo" ? "0.08 mm" : "0.15 mm";
-    }
-    if (buildPlate === "holo") {
-      flWidth = "0.52 mm (Presst voll in Struktur)";
-    }
-
+    // Druckplatte & First Layer
+    let flWidth = buildPlate === "holo" ? "0.52 mm (Presst in Muster)" : "0.50 mm";
     document.getElementById("flLineWidth").innerText = flWidth;
-    document.getElementById("eleFootComp").innerText = eleCompVal;
 
-    // Support Logik
-    const supportCard = document.getElementById("supportCard");
-    let suppNote = "";
-    if (suppMat === "none") {
-      supportCard.classList.add("disabled-card");
-      document.getElementById("supportType").innerText = "Aus (Kein Support)";
-      document.getElementById("supportExtruder").innerText = "-";
-      document.getElementById("supportZDistance").innerText = "-";
-      document.getElementById("supportBottomZ").innerText = "-";
-      document.getElementById("supportInterface").innerText = "-";
-      document.getElementById("supportPattern").innerText = "-";
-      suppNote = "Support deaktiviert. Bedenke max. 45° Überhänge. ";
+    // 2. PASSGENAUIGKEIT & IRONING LOGIK
+    const fitType = document.getElementById("fitType").value;
+    const eleFootToggle = document.getElementById("eleFootToggle").value;
+    const sliceTolerance = document.getElementById("sliceTolerance").value;
+    const ironingMode = document.getElementById("ironingMode").value;
+
+    let xyHole = "+0.00 mm";
+    let xyContour = "0.00 mm";
+    let eleCompVal = eleFootToggle === "on" ? (buildPlate === "holo" ? "0.08 mm" : "0.15 mm") : "0.00 mm (Deaktiviert)";
+    let sliceTolText = sliceTolerance.toUpperCase();
+    let precisionTip = "";
+
+    if (fitType === "pressfit") {
+      xyHole = "+0.10 mm (Bohrung aufweiten)";
+      xyContour = "-0.05 mm (Außenmaß verringern)";
+      precisionTip = "Für festes Einstecken / Presspassung: Löcher leicht aufgeweitet, damit Pins ohne Feilen passen.";
+    } else if (fitType === "sliding") {
+      xyHole = "+0.18 mm";
+      xyContour = "-0.10 mm";
+      sliceTolText = "EXCLUSIVE (Empfohlen)";
+      precisionTip = "Für leichtgängige Lager oder Führungsschienen. Verhindert Klemmen durch Materialquellen.";
+    } else if (fitType === "cut_assembly") {
+      xyHole = "+0.05 mm";
+      xyContour = "-0.08 mm";
+      precisionTip = "Für zusammengeklebte oder gesteckte Schnitt-Baugruppen. Verhindert Spaltmaße an den Nahtstellen.";
     } else {
-      supportCard.classList.remove("disabled-card");
-      let zDist = suppMat !== "same" ? "0.00 mm (Glatt)" : mat.defaultZ;
-      document.getElementById("supportType").innerText = "Tree (Slim / Auto)";
-      document.getElementById("supportExtruder").innerText = suppMat === "same" ? "T1 (Haupt-Düse)" : "T2 / AMS";
-      document.getElementById("supportZDistance").innerText = zDist;
-      document.getElementById("supportBottomZ").innerText = zDist;
-      document.getElementById("supportInterface").innerText = suppMat !== "same" ? "3 - 4 Schichten" : "2 Schichten";
-      document.getElementById("supportPattern").innerText = "Concentric";
-      suppNote = suppMat !== "same" ? "Perfekte Unterseite dank 0.00mm Z-Abstand! " : "Monomaterial Support eingestellt. ";
+      precisionTip = "Standardtoleranzen aktiv. Für präzise Passungen 'Presspassung' oder 'Schiebesitz' wählen.";
+    }
+
+    if (mat.shrink > 0.005) {
+      precisionTip += " ⚠️ Achtung: " + material + " schrumpft stark (~" + (mat.shrink*100).toFixed(1) + "%). Bei Maßhaltigkeit ggf. Bauteil im Slicer um 0.5-1% skaliere!";
+    }
+
+    document.getElementById("xyHoleComp").innerText = xyHole;
+    document.getElementById("xyContourComp").innerText = xyContour;
+    document.getElementById("eleFootComp").innerText = eleCompVal;
+    document.getElementById("sliceTolResult").innerText = sliceTolText;
+    document.getElementById("precisionNote").innerText = precisionTip;
+
+    // Ironing Steuerung
+    const ironingControls = document.getElementById("ironingControls");
+    if (ironingMode === "off") {
+      ironingControls.classList.add("disabled-card");
+      document.getElementById("ironingResult").innerText = "Deaktiviert";
+      document.getElementById("ironingSpacing").innerText = "-";
+    } else {
+      ironingControls.classList.remove("disabled-card");
+      const iFlow = document.getElementById("ironingFlow").value;
+      const iSpeed = document.getElementById("ironingSpeed").value;
+      document.getElementById("ironingResult").innerText = iFlow + "% Flow @ " + iSpeed + " mm/s";
+      document.getElementById("ironingSpacing").innerText = "0.15 mm (Standard)";
     }
 
     // Geschwindigkeiten
@@ -808,9 +898,11 @@
 
     document.getElementById("outerWallSpeed").innerText = Math.round(baseOuter * speedMult) + " mm/s";
     document.getElementById("infillSpeed").innerText = Math.round(baseInfill * speedMult) + " mm/s";
+
+    let suppNote = suppMat !== "none" ? (suppMat !== "same" ? "Schnittstellen-Material gewählt (0.00mm Z-Abstand)." : "Standard Support aktiv.") : "Kein Support.";
     document.getElementById("geometryNote").innerText = suppNote;
 
-    // 2. EUFYMAKE E1 UV LOGIK
+    // 3. EUFYMAKE E1 UV LOGIK
     const enableUv = document.getElementById('enableUv').value === 'yes';
     const uvControlsGroup = document.getElementById('uvControlsGroup');
     const uvOutputCard = document.getElementById('uvOutputCard');
@@ -882,13 +974,12 @@
     document.getElementById("uvInkVolume").innerText = "~" + (cmykPart + whiteGlossPart).toFixed(2) + " ml (" + areaCm2 + " cm²)";
     document.getElementById("uvNote").innerText = uvTipText;
 
-    // Auto-update Tintenverbrauch im Rechner
     if (enableUv) {
       document.getElementById("uvCmyk").value = cmykPart.toFixed(2);
       document.getElementById("uvWhiteGloss").value = whiteGlossPart.toFixed(2);
     }
 
-    // 3. KALKULATION DIREKT
+    // 4. KALKULATION DIREKT
     const printHours = parseFloat(document.getElementById('printHours').value) || 0;
     const filamentGrams = parseFloat(document.getElementById('filamentGrams').value) || 0;
     const filamentCostKg = parseFloat(document.getElementById('filamentCostKg').value) || 0;
