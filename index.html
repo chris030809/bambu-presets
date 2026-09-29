@@ -1,430 +1,723 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bambu Slicer Master Tool - Presets, Holo Plates & High-Flow</title>
-    <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #00ae42;
-            --accent-warn: #e67e22;
-            --accent-blue: #3498db;
-            --accent-purple: #9b59b6;
-            --accent-holo: #e056fd;
-            --text-color: #ffffff;
-            --text-muted: #a0a0a0;
-            --border-color: #333333;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bambu Slicer & eufyMake E1 UV Master Tool</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --accent-3d: #06b6d4;
+      --accent-uv: #a855f7;
+      --accent-green: #10b981;
+      --accent-warn: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+    }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 12px;
-            font-size: 15px;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      line-height: 1.5;
+      font-size: 15px;
+    }
 
-        .container {
-            max-width: 680px;
-            margin: 0 auto;
-        }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-        h1 {
-            text-align: center;
-            color: var(--accent);
-            font-size: 1.4rem;
-            margin: 10px 0 15px 0;
-            font-weight: 700;
-        }
+    header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+      text-align: center;
+    }
 
-        .controls {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-        }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent-3d), var(--accent-uv));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 12px;
-        }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
 
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 24px 0 12px 0;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .section-title.print3d { color: var(--accent-3d); border-bottom-color: var(--accent-3d); }
+    .section-title.uv { color: var(--accent-uv); border-bottom-color: var(--accent-uv); }
+    .section-title.calc { color: var(--accent-green); border-bottom-color: var(--accent-green); }
 
-        select, input[type="file"] {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: #2a2a2a;
-            color: white;
-            font-size: 0.95rem;
-            width: 100%;
-            outline: none;
-        }
+    .preset-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
 
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 20px;
-        }
+    .preset-btn {
+      background: #334155;
+      color: var(--text);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
 
-        .drop-zone {
-            border: 2px dashed var(--accent);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            background: #18261c;
-            color: #fff;
-            margin-bottom: 16px;
-            cursor: pointer;
-        }
+    .preset-btn:hover {
+      background: #475569;
+    }
 
-        .drop-zone p {
-            margin: 5px 0 0 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+    .drop-zone {
+      border: 2px dashed var(--accent-3d);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      background: #132338;
+      color: #fff;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
 
-        .results-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+    .drop-zone p {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid var(--border-color);
-            border-left: 5px solid var(--accent);
-            transition: opacity 0.3s ease;
-        }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
 
-        .card.support-card {
-            border-left-color: var(--accent-blue);
-        }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+    }
 
-        .card.firstlayer-card {
-            border-left-color: var(--accent-holo);
-        }
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
 
-        .card.disabled-card {
-            opacity: 0.4;
-        }
+    .card.print3d-card h3 { color: var(--accent-3d); }
+    .card.uv-card h3 { color: var(--accent-uv); }
+    .card.calc-card h3 { color: var(--accent-green); }
 
-        .card h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.05rem;
-            color: var(--accent);
-        }
+    .disabled-card {
+      opacity: 0.4;
+    }
 
-        .card.support-card h3 {
-            color: var(--accent-blue);
-        }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
-        .card.firstlayer-card h3 {
-            color: var(--accent-holo);
-        }
+    @media (max-width: 500px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 7px 0;
-            border-bottom: 1px solid #2a2a2a;
-            font-size: 0.9rem;
-        }
+    .form-group {
+      margin-bottom: 10px;
+    }
 
-        .setting-row:last-child {
-            border-bottom: none;
-        }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
 
-        .setting-label {
-            color: var(--text-muted);
-        }
+    input, select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+    }
 
-        .setting-value {
-            font-weight: 600;
-            text-align: right;
-        }
+    input:focus, select:focus {
+      border-color: var(--accent-3d);
+    }
 
-        .tip-box {
-            background-color: #1a2e22;
-            border: 1px solid #285435;
-            padding: 14px;
-            margin-top: 16px;
-            border-radius: 12px;
-            font-size: 0.88rem;
-            line-height: 1.4;
-        }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
 
-        .tip-box strong {
-            color: var(--accent);
-            display: block;
-            margin-bottom: 4px;
-        }
+    .row .form-group {
+      flex: 1;
+    }
 
-        .material-guide {
-            background-color: #1d232a;
-            border: 1px solid #334155;
-            padding: 14px;
-            margin-top: 16px;
-            border-radius: 12px;
-            font-size: 0.88rem;
-            line-height: 1.4;
-        }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.9rem;
+    }
 
-        .material-guide strong {
-            color: #38bdf8;
-            display: block;
-            margin-bottom: 6px;
-        }
+    .setting-row:last-child {
+      border-bottom: none;
+    }
 
-        .hardware-alert {
-            background-color: #3d2412;
-            border: 1px solid #854316;
-            color: #ffaa66;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 0.85rem;
-            display: none;
-        }
-    </style>
+    .setting-label {
+      color: var(--text-muted);
+    }
+
+    .setting-value {
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.95rem;
+    }
+
+    .result-row.total {
+      font-weight: bold;
+      font-size: 1.1rem;
+      border-bottom: 2px solid var(--accent-green);
+      color: var(--accent-green);
+      margin-top: 10px;
+    }
+
+    .tip-box {
+      background-color: #0f293a;
+      border: 1px solid #1e4968;
+      padding: 12px;
+      margin-top: 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+    }
+
+    .tip-box.uv-tip {
+      background-color: #27173a;
+      border-color: #52277a;
+    }
+
+    .tip-box strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent-3d);
+    }
+
+    .tip-box.uv-tip strong {
+      color: var(--accent-uv);
+    }
+
+    .hardware-alert {
+      background-color: #451a03;
+      border: 1px solid #b45309;
+      color: #fcd34d;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Bambu Slicer Master Tool</h1>
+  <header>
+    <h1>Bambu Slicer & eufyMake E1 Master Tool</h1>
+    <p class="subtitle">Slicer-Optimierung, UV-Druck Setup & Vollständige Gewerbekalkulation</p>
+  </header>
 
-    <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
-        <strong>📁 STL / 3MF / STEP Datei importieren</strong>
-        <p id="fileNameDisplay">Datei antippen oder hineinziehen für Auto-Analyse</p>
-        <input type="file" id="fileInput" accept=".stl,.3mf,.step" style="display:none" onchange="handleFileSelect(event)">
+  <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+    <strong>📁 3D-Datei (STL/3MF) oder UV-Grafik importieren</strong>
+    <p id="fileNameDisplay">Datei antippen oder hineinziehen für Auto-Analyse</p>
+    <input type="file" id="fileInput" accept=".stl,.3mf,.step,.png,.jpg,.svg" style="display:none" onchange="handleFileSelect(event)">
+  </div>
+
+  <div id="hardwareAlert" class="hardware-alert"></div>
+
+  <!-- Presets -->
+  <div class="preset-bar">
+    <span style="font-size: 0.85rem; align-self: center; color: var(--text-muted);">Presets:</span>
+    <button class="preset-btn" onclick="applyPreset('h2d')">Bambu Lab H2D (Dual/High-Temp)</button>
+    <button class="preset-btn" onclick="applyPreset('x1c')">Bambu Lab X1C / P1S</button>
+    <button class="preset-btn" onclick="applyPreset('p1p')">Bambu Lab P1P / A1</button>
+    <button class="preset-btn" onclick="applyPreset('a1m')">Bambu Lab A1 Mini</button>
+    <button class="preset-btn" onclick="applyPreset('pla')">Standard PLA (20€/kg)</button>
+    <button class="preset-btn" onclick="applyPreset('petg')">PETG (25€/kg)</button>
+  </div>
+
+  <!-- SECTION 1: 3D DRUCK PARAMETRIERUNG -->
+  <div class="section-title print3d">🖨️ 1. 3D-Druck Einstellungen & Slicer</div>
+  <div class="grid">
+    <div class="card print3d-card">
+      <h3>Drucker & Material</h3>
+      <div class="form-group">
+        <label for="printerSelect">Druckermodell</label>
+        <select id="printerSelect" onchange="onPrinterChange()">
+          <option value="h2d" selected>Bambu Lab H2D / H2D Pro (350W Ø, 1.200€)</option>
+          <option value="x1c">Bambu Lab X1-Carbon / P1S (150W Ø, 1.200€)</option>
+          <option value="p1p">Bambu Lab P1P / A1 (120W Ø, 600€)</option>
+          <option value="a1m">Bambu Lab A1 Mini (80W Ø, 300€)</option>
+        </select>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="nozzleType">Düsen-Typ</label>
+          <select id="nozzleType" onchange="calculate()">
+            <option value="standard_04">Standard Stainless/Hardened (0.4mm)</option>
+            <option value="highflow_04" selected>High-Flow (0.4mm - CHT/ObXidian)</option>
+            <option value="highflow_06">High-Flow (0.6mm - High Speed)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="buildPlate">Druckplatte</label>
+          <select id="buildPlate" onchange="calculate()">
+            <option value="holo" selected>Holo / PEO / PED / PET (Muster)</option>
+            <option value="smooth_pei">Smooth PEI / High Temp</option>
+            <option value="textured_pei">Textured PEI Plate</option>
+            <option value="cool_plate">Bambu Cool Plate</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="eleFootToggle">Elefantenfuß-Komp.</label>
+          <select id="eleFootToggle" onchange="calculate()">
+            <option value="on" selected>Ein (Aktiviert)</option>
+            <option value="off">Aus (Deaktiviert)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="brand">Filament Marke</label>
+          <select id="brand" onchange="calculate()">
+            <option value="bambu" selected>Bambu Lab</option>
+            <option value="sunlu">Sunlu</option>
+            <option value="esun">eSUN</option>
+            <option value="geeetech">Geeetech</option>
+            <option value="tinmorry">Tinmorry</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="material">Filament Typ</label>
+          <select id="material" onchange="calculate()">
+            <option value="PLA" selected>PLA / PLA+</option>
+            <option value="PLA-CF">PLA-CF (Carbon)</option>
+            <option value="PETG">PETG</option>
+            <option value="PETG-CF">PETG-CF (Carbon)</option>
+            <option value="ABS">ABS</option>
+            <option value="ASA">ASA</option>
+            <option value="ASA-GF">ASA-GF (Glasfaser)</option>
+            <option value="PA-CF">PA-CF / Nylon Carbon</option>
+            <option value="TPU">TPU (Flexibel)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="purpose">Geometrie / Zweck</label>
+          <select id="purpose" onchange="calculate()">
+            <option value="standard" selected>Standard / Allround</option>
+            <option value="functional">Funktionsteil (Hohe Last)</option>
+            <option value="detail">Organisch / Figur (Optik)</option>
+            <option value="thinwall">Dünnwandig / Gehäuse</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="supportMaterial">Support / Trennschicht</label>
+        <select id="supportMaterial" onchange="calculate()">
+          <option value="none">Kein Support benötigt</option>
+          <option value="same" selected>Gleiches Material (Schnittstelle)</option>
+          <option value="support_pla">Bambu Support for PLA</option>
+          <option value="support_petg">Bambu Support for PETG / ABS</option>
+          <option value="pva">PVA / BVOH (Wasserlöslich)</option>
+          <option value="petg_for_pla">PETG als Trennschicht für PLA</option>
+          <option value="pla_for_petg">PLA als Trennschicht für PETG</option>
+        </select>
+      </div>
     </div>
 
-    <div id="hardwareAlert" class="hardware-alert"></div>
-    
-    <div class="controls">
-        <div class="form-group">
-            <label for="printer">Drucker Modell</label>
-            <select id="printer" onchange="updateSettings()">
-                <option value="H2D" selected>Bambu Lab H2D Series (Dual Nozzle)</option>
-                <option value="P1S">Bambu Lab P1S (AMS Single-Nozzle)</option>
-                <option value="P1P">Bambu Lab P1P (Offen)</option>
-            </select>
-        </div>
+    <!-- 3D Slicer Output Card -->
+    <div class="card print3d-card">
+      <h3>Slicer Empfehlungen & Parameter</h3>
+      <div class="setting-row"><span class="setting-label">Düse Temp:</span><span class="setting-value" id="nozzleTemp">-</span></div>
+      <div class="setting-row"><span class="setting-label">Druckbett Temp:</span><span class="setting-value" id="bedTemp">-</span></div>
+      <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
+      <div class="setting-row"><span class="setting-label">Flow Ratio:</span><span class="setting-value" id="flowRatio">-</span></div>
+      <div class="setting-row"><span class="setting-label">1. Layer Linienbreite:</span><span class="setting-value" id="flLineWidth">-</span></div>
+      <div class="setting-row"><span class="setting-label">Elefantenfuß Komp.:</span><span class="setting-value" id="eleFootComp">-</span></div>
+      <div class="setting-row"><span class="setting-label">Außenwand Speed:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
+      <div class="setting-row"><span class="setting-label">Infill Speed:</span><span class="setting-value" id="infillSpeed">-</span></div>
+      <div class="setting-row"><span class="setting-label">Gehäuse/Tür:</span><span class="setting-value" id="chamberTip">-</span></div>
 
-        <div class="form-group">
-            <label for="nozzleType">Nozzle / Düsen-Typ</label>
-            <select id="nozzleType" onchange="updateSettings()">
-                <option value="standard_04">Standard Stainless / Hardened Steel (0.4 mm)</option>
-                <option value="highflow_04" selected>High-Flow Nozzle (0.4 mm - CHT / ObXidian / E3D)</option>
-                <option value="highflow_06">High-Flow Nozzle (0.6 mm - High Speed)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="buildPlate">Druckplatte (Build Plate)</label>
-            <select id="buildPlate" onchange="updateSettings()">
-                <option value="holo" selected>Holo / PEO / PED / PET (Hologramm / Muster)</option>
-                <option value="smooth_pei">Smooth PEI / Smooth High Temp Plate</option>
-                <option value="textured_pei">Textured PEI Plate (Muster-Textur)</option>
-                <option value="cool_plate">Bambu Cool Plate / Engineering Plate</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="brand">Filament Marke</label>
-            <select id="brand" onchange="updateSettings()">
-                <option value="bambu" selected>Bambu Lab</option>
-                <option value="sunlu">Sunlu</option>
-                <option value="esun">eSUN</option>
-                <option value="geeetech">Geeetech</option>
-                <option value="tinmorry">Tinmorry</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="material">Haupt-Filament (Modell)</label>
-            <select id="material" onchange="updateSettings()">
-                <option value="PLA" selected>PLA / PLA+</option>
-                <option value="PLA-CF">PLA-CF (Carbon)</option>
-                <option value="PETG">PETG</option>
-                <option value="PETG-CF">PETG-CF (Carbon)</option>
-                <option value="ABS">ABS</option>
-                <option value="ASA">ASA</option>
-                <option value="ASA-GF">ASA-GF (Glasfaser)</option>
-                <option value="PA-CF">PA-CF / Nylon Carbon</option>
-                <option value="TPU">TPU (Flexibel)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="supportMaterial">Support / Trennschicht Material</label>
-            <select id="supportMaterial" onchange="updateSettings()">
-                <option value="none">Kein Support benötigt (Deaktiviert)</option>
-                <option value="same" selected>Gleiches Material (Schnittstelle mit Hauptmaterial)</option>
-                <option value="support_pla">Bambu Support for PLA (Dedicated Interface)</option>
-                <option value="support_petg">Bambu Support for PETG / ABS</option>
-                <option value="pva">PVA / BVOH (Wasserlöslich)</option>
-                <option value="petg_for_pla">PETG als Trennschicht für PLA (Dual/AMS)</option>
-                <option value="pla_for_petg">PLA als Trennschicht für PETG (Dual/AMS)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="purpose">Erkannte Geometrie / Zweck</label>
-            <select id="purpose" onchange="updateSettings()">
-                <option value="standard" selected>Standard / Allround</option>
-                <option value="functional">Funktionsteil (Hohe Last / Torsion)</option>
-                <option value="detail">Organisch / Figur (Optischer Fokus)</option>
-                <option value="thinwall">Dünnwandig / Gehäuse</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="results-grid">
-        <!-- Druckplatten & Erste Schicht Card -->
-        <div class="card firstlayer-card">
-            <h3>Druckplatte & 1. Schicht Optimierung</h3>
-            <div class="setting-row"><span class="setting-label">Platten-Typ:</span><span class="setting-value" id="plateDisplay">Holo / PEO</span></div>
-            <div class="setting-row"><span class="setting-label">First Layer Line Width:</span><span class="setting-value" id="flLineWidth">0.52 mm</span></div>
-            <div class="setting-row"><span class="setting-label">First Layer Speed:</span><span class="setting-value" id="flSpeed">30 mm/s</span></div>
-            <div class="setting-row"><span class="setting-label">First Layer Flow Ratio:</span><span class="setting-value" id="flFlow">1.05 (+5% Druck)</span></div>
-            <div class="setting-row"><span class="setting-label">Elefantenfuß-Kompensation:</span><span class="setting-value" id="eleFootComp">0.10 mm</span></div>
-            <div class="setting-row"><span class="setting-label">Bett-Temperatur (1. Layer):</span><span class="setting-value" id="flBedTemp">65°C</span></div>
-        </div>
-
-        <!-- Professional Support Card -->
-        <div class="card support-card" id="supportCard">
-            <h3>Support & Trennschicht (Pro Settings)</h3>
-            <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Slim / Auto)</span></div>
-            <div class="setting-row"><span class="setting-label">Schnittstellen Extruder:</span><span class="setting-value" id="supportExtruder">T2 (Support-Düsenkopf)</span></div>
-            <div class="setting-row"><span class="setting-label">Top Z-Abstand (Z-Distance):</span><span class="setting-value" id="supportZDistance">0.20 mm</span></div>
-            <div class="setting-row"><span class="setting-label">Bottom Z-Abstand:</span><span class="setting-value" id="supportBottomZ">0.20 mm</span></div>
-            <div class="setting-row"><span class="setting-label">Schnittstellen-Schichten:</span><span class="setting-value" id="supportInterface">3 Schichten</span></div>
-            <div class="setting-row"><span class="setting-label">Schnittstellen-Muster:</span><span class="setting-value" id="supportPattern">Concentric / Rectangular</span></div>
-            <div class="setting-row"><span class="setting-label">Schnittstellen-Abstand:</span><span class="setting-value" id="supportSpacing">0.0 mm (Dicht)</span></div>
-            <div class="setting-row"><span class="setting-label">XY-Abstand zur Wand:</span><span class="setting-value" id="supportXYDistance">0.35 mm</span></div>
-        </div>
-
-        <div class="card">
-            <h3>Temperatur & Flow-Limits (Nozzle tuned)</h3>
-            <div class="setting-row"><span class="setting-label">Düse (Nozzle Temp):</span><span class="setting-value" id="nozzleTemp">-</span></div>
-            <div class="setting-row"><span class="setting-label">Druckbett (Standard):</span><span class="setting-value" id="bedTemp">-</span></div>
-            <div class="setting-row"><span class="setting-label">Max. Volumenfluss:</span><span class="setting-value" id="maxVolumetric">-</span></div>
-            <div class="setting-row"><span class="setting-label">Bauteillüfter:</span><span class="setting-value" id="fanSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Gehäuse:</span><span class="setting-value" id="chamberTip">-</span></div>
-        </div>
-
-        <div class="card">
-            <h3>Wände & Infill-Geometrie</h3>
-            <div class="setting-row"><span class="setting-label">Schichthöhe (Layer Height):</span><span class="setting-value" id="layerHeight">0.20 mm</span></div>
-            <div class="setting-row"><span class="setting-label">Wandlinien:</span><span class="setting-value" id="wallLoops">-</span></div>
-            <div class="setting-row"><span class="setting-label">Wand-Reihenfolge:</span><span class="setting-value" id="wallOrder">-</span></div>
-            <div class="setting-row"><span class="setting-label">Top / Bottom:</span><span class="setting-value" id="topBottomLayers">-</span></div>
-            <div class="setting-row"><span class="setting-label">Infill %:</span><span class="setting-value" id="infillDensity">-</span></div>
-            <div class="setting-row"><span class="setting-label">Optimales Muster:</span><span class="setting-value" id="infillPattern">-</span></div>
-            <div class="setting-row"><span class="setting-label">Bügeln (Ironing):</span><span class="setting-value" id="ironing">-</span></div>
-        </div>
-
-        <div class="card">
-            <h3>Geschwindigkeit & High-Flow Speeds</h3>
-            <div class="setting-row"><span class="setting-label">Außenwand Speed:</span><span class="setting-value" id="outerWallSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Innenwand Speed:</span><span class="setting-value" id="innerWallSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Infill Speed:</span><span class="setting-value" id="infillSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Top Surface Speed:</span><span class="setting-value" id="topSpeed">-</span></div>
-            <div class="setting-row"><span class="setting-label">Flow Ratio (Main):</span><span class="setting-value" id="flowRatio">-</span></div>
-            <div class="setting-row"><span class="setting-label">Naht-Ausrichtung:</span><span class="setting-value" id="seamPos">-</span></div>
-        </div>
-    </div>
-
-    <div class="tip-box">
-        <strong>Expertentipp für Support, Platten & High-Flow:</strong>
+      <div class="tip-box">
+        <strong>Expertentipp für 3D-Druck:</strong>
         <span id="geometryNote">-</span>
+      </div>
     </div>
 
-    <div class="material-guide">
-        <strong>Material-Guide & Einsatzbereiche:</strong>
-        <span id="materialComparisonNote">-</span>
+    <!-- Support Details Card -->
+    <div class="card print3d-card" id="supportCard">
+      <h3>Support & Schnittstellen Parameter</h3>
+      <div class="setting-row"><span class="setting-label">Support Typ:</span><span class="setting-value" id="supportType">Tree (Slim / Auto)</span></div>
+      <div class="setting-row"><span class="setting-label">Schnittstellen Extruder:</span><span class="setting-value" id="supportExtruder">T2</span></div>
+      <div class="setting-row"><span class="setting-label">Top Z-Abstand:</span><span class="setting-value" id="supportZDistance">0.20 mm</span></div>
+      <div class="setting-row"><span class="setting-label">Bottom Z-Abstand:</span><span class="setting-value" id="supportBottomZ">0.20 mm</span></div>
+      <div class="setting-row"><span class="setting-label">Schnittstellen-Schichten:</span><span class="setting-value" id="supportInterface">2 Schichten</span></div>
+      <div class="setting-row"><span class="setting-label">Schnittstellen-Muster:</span><span class="setting-value" id="supportPattern">Concentric</span></div>
     </div>
+  </div>
+
+  <!-- SECTION 2: EUFYMAKE E1 UV-DRUCK SETTINGS -->
+  <div class="section-title uv">🎨 2. eufyMake E1 UV-Druck Einstellungen</div>
+  <div class="grid">
+    <div class="card uv-card">
+      <h3>UV Werkstück & Effekt</h3>
+      <div class="form-group">
+        <label for="enableUv">UV-Druck aktivieren?</label>
+        <select id="enableUv" onchange="calculate()">
+          <option value="no">Nein (Nur 3D-Druck)</option>
+          <option value="yes" selected>Ja (UV-Veredelung / Druck)</option>
+        </select>
+      </div>
+
+      <div id="uvControlsGroup">
+        <div class="form-group">
+          <label for="uvSubstrate">Werkstück / Material</label>
+          <select id="uvSubstrate" onchange="calculate()">
+            <option value="acrylic" selected>Acryl / Plexiglas (Glatt/Klar)</option>
+            <option value="wood">Holz / MDF (Saugend)</option>
+            <option value="metal">Metall / Aluminium (Beschichtet/Blank)</option>
+            <option value="leather">Leder / Kunstleder (Flexibel)</option>
+            <option value="canvas">Leinwand / Canvas (Textil)</option>
+            <option value="mug">Becher / Flasche (Rotary Attachment)</option>
+            <option value="print3d">3D-Druckteil (PLA/PETG Direct Print)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="uvEffect">Druckeffekt & Weißschichten</label>
+          <select id="uvEffect" onchange="calculate()">
+            <option value="standard">Standard CMYK (Direktdruck)</option>
+            <option value="white_base" selected>1x Weiß Unterdruck + CMYK (Satt)</option>
+            <option value="white_double">2x Weiß Unterdruck + CMYK (Blickdicht)</option>
+            <option value="emboss">3D-Relief / Prägedruck (Mehrfach Weiß)</option>
+            <option value="gloss_finish">CMYK + Glanzlack / Gloss Finish</option>
+            <option value="backlit">Backlit / Transparent (Sandwich)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="uvWidth">Breite (cm)</label>
+            <input type="number" id="uvWidth" value="10" step="0.5" oninput="calculate()">
+          </div>
+          <div class="form-group">
+            <label for="uvHeight">Höhe / Länge (cm)</label>
+            <input type="number" id="uvHeight" value="15" step="0.5" oninput="calculate()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UV Output Card -->
+    <div class="card uv-card" id="uvOutputCard">
+      <h3>eufyMake E1 UV Parameter</h3>
+      <div class="setting-row"><span class="setting-label">Auflösung:</span><span class="setting-value" id="uvRes">720x1440 dpi</span></div>
+      <div class="setting-row"><span class="setting-label">Pass / Modus:</span><span class="setting-value" id="uvPass">Bi-directional 16-Pass</span></div>
+      <div class="setting-row"><span class="setting-label">Weißschichten:</span><span class="setting-value" id="uvWhiteLayers">1x Base (100%)</span></div>
+      <div class="setting-row"><span class="setting-label">UV-Lampen Leistung:</span><span class="setting-value" id="uvLampPower">80% Intensity</span></div>
+      <div class="setting-row"><span class="setting-label">Primer-Empfehlung:</span><span class="setting-value" id="uvPrimer">Empfohlen</span></div>
+      <div class="setting-row"><span class="setting-label">Geschätzter Tintenverbrauch:</span><span class="setting-value" id="uvInkVolume">~0.18 ml</span></div>
+
+      <div class="tip-box uv-tip">
+        <strong>eufyMake E1 Praxistipp:</strong>
+        <span id="uvNote">-</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: GEWERBE-KOSTENRECHNER -->
+  <div class="section-title calc">💰 3. Gewerbe-Kostenrechner (Verkauf & Selbstkosten)</div>
+  <div class="grid">
+    <!-- Eingaben Kosten & Aufwand -->
+    <div class="card calc-card">
+      <h3>Kostenfaktoren & Laufzeiten</h3>
+      <div class="form-group">
+        <label for="taxMode">Gewerbe / Steuersatz</label>
+        <select id="taxMode" onchange="calculate()">
+          <option value="kleingewerbe" selected>Kleingewerbe §19 UStG (Ohne MwSt.)</option>
+          <option value="regel">Regelbesteuerung (19% MwSt.)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="printHours">Druckzeit 3D (Std.)</label>
+          <input type="number" id="printHours" value="4.5" step="0.1" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="filamentGrams">Filament (g)</label>
+          <input type="number" id="filamentGrams" value="120" step="1" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="filamentCostKg">Filament (€/kg)</label>
+          <input type="number" id="filamentCostKg" value="20.00" step="0.5" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="powerWatts">Strom Ø (Watt)</label>
+          <input type="number" id="powerWatts" value="350" step="10" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="printerPrice">Anschaffung (€)</label>
+          <input type="number" id="printerPrice" value="1200" step="50" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="printerLifespan">Nutzung (Std.)</label>
+          <input type="number" id="printerLifespan" value="4000" step="500" oninput="calculate()">
+        </div>
+      </div>
+
+      <hr style="border-color: var(--card-border); margin: 12px 0;">
+
+      <div class="row">
+        <div class="form-group">
+          <label for="uvCmyk">CMYK Tinte (ml)</label>
+          <input type="number" id="uvCmyk" value="0.10" step="0.01" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="uvWhiteGloss">Weiß/Gloss (ml)</label>
+          <input type="number" id="uvWhiteGloss" value="0.15" step="0.01" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="uvInkCostMl">Tintenpreis (€/ml)</label>
+          <input type="number" id="uvInkCostMl" value="0.12" step="0.01" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="blankCost">Rohling / Canvas (€)</label>
+          <input type="number" id="blankCost" value="1.50" step="0.05" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="laborMinutes">Arbeitszeit (Min.)</label>
+          <input type="number" id="laborMinutes" value="15" step="1" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label for="laborRate">Stundenlohn (€/h)</label>
+          <input type="number" id="laborRate" value="30.00" step="1" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="elecPrice">Strompreis (€/kWh)</label>
+        <input type="number" id="elecPrice" value="0.38" step="0.01" oninput="calculate()">
+      </div>
+    </div>
+
+    <!-- Auswertung Kosten & Marge -->
+    <div class="card calc-card">
+      <h3>Kostenaufschlüsselung & Preise</h3>
+      <div class="result-row">
+        <span>Filamentkosten:</span>
+        <span id="resFilament">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>Stromkosten (3D):</span>
+        <span id="resPower">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>Drucker-Verschleiß:</span>
+        <span id="resWear">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>UV-Tinte & Rohling:</span>
+        <span id="resUv">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>Arbeitskosten:</span>
+        <span id="resLabor">0,00 €</span>
+      </div>
+
+      <div class="result-row total">
+        <span>Selbstkosten (Netto):</span>
+        <span id="resTotalCost">0,00 €</span>
+      </div>
+
+      <hr style="border-color: var(--card-border); margin: 16px 0;">
+
+      <div class="form-group">
+        <label for="marginPercent">Gewinnmarge / Aufschlag (%)</label>
+        <input type="number" id="marginPercent" value="150" step="5" oninput="calculate()">
+      </div>
+
+      <div class="result-row">
+        <span>Verkaufspreis Netto:</span>
+        <span id="resNetSell">0,00 €</span>
+      </div>
+      <div class="result-row">
+        <span>MwSt. (<span id="vatPercentLabel">0%</span>):</span>
+        <span id="resVat">0,00 €</span>
+      </div>
+      <div class="result-row total" style="color: var(--accent-3d); border-color: var(--accent-3d);">
+        <span>Empf. Verkaufspreis (Brutto):</span>
+        <span id="resGrossSell">0,00 €</span>
+      </div>
+      <div class="result-row" style="margin-top: 8px;">
+        <span>Reingewinn pro Stück:</span>
+        <span id="resProfit" style="color: var(--accent-green); font-weight: bold;">0,00 €</span>
+      </div>
+
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;" id="taxNote">
+        Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-const matDatabase = {
-    "PLA":      { nozzle: [210, 220], bed: [55, 65],  fan: "100%", flow: 0.98, vol: 21, defaultZ: "0.20 mm", hardNozzle: false, guide: "PLA: Sehr leicht zu drucken, extrem steif, perfekte Optik. Ideal für Holo-Platten und Figuren." },
-    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  fan: "100%", flow: 0.98, vol: 18, defaultZ: "0.20 mm", hardNozzle: true,  guide: "PLA-CF: Karbonverstärkt, extrem mattes Finish, kaschiert Schichtlinien perfekt." },
-    "PETG":     { nozzle: [235, 250], bed: [70, 80],  fan: "40-60%", flow: 0.95, vol: 13, defaultZ: "0.24 mm", hardNozzle: false, guide: "PETG: Zäh, schlagfest und witterungsbeständig (~75°C). Benötigt sauberen Flow gegen Stringing." },
-    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  fan: "30-50%", flow: 0.95, vol: 12, defaultZ: "0.24 mm", hardNozzle: true,  guide: "PETG-CF: Hohe mechanische Belastbarkeit & Hitzeformbeständigkeit. Mattschwarze Profi-Optik." },
-    "ABS":      { nozzle: [245, 265], bed: [90, 100], fan: "0-20%", flow: 0.95, vol: 16, defaultZ: "0.20 mm", hardNozzle: false, guide: "ABS: Hitzebeständig bis ~95°C. Benötigt geschlossenes Gehäuse gegen Warping." },
-    "ASA":      { nozzle: [250, 270], bed: [95, 105], fan: "0-25%", flow: 0.95, vol: 15, defaultZ: "0.20 mm", hardNozzle: false, guide: "ASA: Wie ABS, aber UV- und witterungsbeständig. Ideal für Außeneinsatz & Fahrzeuge." },
-    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], fan: "0-20%", flow: 0.95, vol: 14, defaultZ: "0.22 mm", hardNozzle: true,  guide: "ASA-GF: Glasfaserverstärktes ASA. Extrem verzugsarm & verwindungssteif." },
-    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], fan: "0-10%", flow: 0.96, vol: 10, defaultZ: "0.25 mm", hardNozzle: true,  guide: "PA-CF: High-End Nylon Carbon. Höchste Festigkeit & Temperaturbeständigkeit (>120°C)." },
-    "TPU":      { nozzle: [220, 235], bed: [30, 45],  fan: "80-100%", flow: 1.00, vol: 3.5, defaultZ: "0.20 mm", hardNozzle: false, guide: "TPU: Gummiartig & flexibel. Muss langsam gedruckt werden." }
-};
+  const matDatabase = {
+    "PLA":      { nozzle: [210, 220], bed: [55, 65],  flow: 0.98, vol: 21, defaultZ: "0.20 mm", hardNozzle: false },
+    "PLA-CF":   { nozzle: [220, 240], bed: [55, 65],  flow: 0.98, vol: 18, defaultZ: "0.20 mm", hardNozzle: true },
+    "PETG":     { nozzle: [235, 250], bed: [70, 80],  flow: 0.95, vol: 13, defaultZ: "0.24 mm", hardNozzle: false },
+    "PETG-CF":  { nozzle: [240, 260], bed: [70, 80],  flow: 0.95, vol: 12, defaultZ: "0.24 mm", hardNozzle: true },
+    "ABS":      { nozzle: [245, 265], bed: [90, 100], flow: 0.95, vol: 16, defaultZ: "0.20 mm", hardNozzle: false },
+    "ASA":      { nozzle: [250, 270], bed: [95, 105], flow: 0.95, vol: 15, defaultZ: "0.20 mm", hardNozzle: false },
+    "ASA-GF":   { nozzle: [255, 275], bed: [95, 105], flow: 0.95, vol: 14, defaultZ: "0.22 mm", hardNozzle: true },
+    "PA-CF":    { nozzle: [275, 290], bed: [80, 100], flow: 0.96, vol: 10, defaultZ: "0.25 mm", hardNozzle: true },
+    "TPU":      { nozzle: [220, 235], bed: [30, 45],  flow: 1.00, vol: 3.5, defaultZ: "0.20 mm", hardNozzle: false }
+  };
 
-const brandOffsets = {
-    "bambu":    { tempAdd: 0,  flowMult: 1.00, note: "Bambu Original: Optimal abgestimmt." },
-    "sunlu":    { tempAdd: -5, flowMult: 0.98, note: "Sunlu: Leicht reduzierter Flow für saubere Flächen." },
-    "esun":     { tempAdd: 5,  flowMult: 0.99, note: "eSUN: +5°C Temperatur für maximale Schichtverbindung." },
-    "geeetech": { tempAdd: 0,  flowMult: 0.97, note: "Geeetech: Geringerer Fluss verhindert Fädenbildung." },
-    "tinmorry": { tempAdd: 0,  flowMult: 0.98, note: "Tinmorry: Sehr präzise Schichtdicken." }
-};
+  const brandOffsets = {
+    "bambu":    { tempAdd: 0,  flowMult: 1.00 },
+    "sunlu":    { tempAdd: -5, flowMult: 0.98 },
+    "esun":     { tempAdd: 5,  flowMult: 0.99 },
+    "geeetech": { tempAdd: 0,  flowMult: 0.97 },
+    "tinmorry": { tempAdd: 0,  flowMult: 0.98 }
+  };
 
-function handleFileSelect(evt) {
+  function handleFileSelect(evt) {
     const file = evt.target.files[0];
     if (!file) return;
 
     const fname = file.name.toLowerCase();
-    const size = file.size;
-
-    document.getElementById('fileNameDisplay').innerText = "Analyse: " + file.name + " (" + (size / 1024).toFixed(1) + " KB)";
+    document.getElementById('fileNameDisplay').innerText = "Analyse: " + file.name;
 
     const purposeSelect = document.getElementById("purpose");
-
     if (fname.includes("statue") || fname.includes("figure") || fname.includes("bust")) {
-        purposeSelect.value = "detail";
+      purposeSelect.value = "detail";
     } else if (fname.includes("gear") || fname.includes("mount") || fname.includes("bracket")) {
-        purposeSelect.value = "functional";
+      purposeSelect.value = "functional";
     } else if (fname.includes("box") || fname.includes("case") || fname.includes("thin")) {
-        purposeSelect.value = "thinwall";
-    } else if (size > 5000000) {
-        purposeSelect.value = "detail";
-    } else {
-        purposeSelect.value = "standard";
+      purposeSelect.value = "thinwall";
     }
+    calculate();
+  }
 
-    updateSettings();
-}
+  function onPrinterChange() {
+    const val = document.getElementById('printerSelect').value;
+    if (val === 'h2d') {
+      document.getElementById('powerWatts').value = 350;
+      document.getElementById('printerPrice').value = 1200;
+      document.getElementById('printerLifespan').value = 4000;
+    } else if (val === 'x1c') {
+      document.getElementById('powerWatts').value = 150;
+      document.getElementById('printerPrice').value = 1200;
+      document.getElementById('printerLifespan').value = 3000;
+    } else if (val === 'p1p') {
+      document.getElementById('powerWatts').value = 120;
+      document.getElementById('printerPrice').value = 600;
+      document.getElementById('printerLifespan').value = 2500;
+    } else if (val === 'a1m') {
+      document.getElementById('powerWatts').value = 80;
+      document.getElementById('printerPrice').value = 300;
+      document.getElementById('printerLifespan').value = 2000;
+    }
+    calculate();
+  }
 
-function updateSettings() {
-    const printer = document.getElementById("printer").value;
+  function applyPreset(type) {
+    if (type === 'h2d' || type === 'x1c' || type === 'p1p' || type === 'a1m') {
+      document.getElementById('printerSelect').value = type;
+      onPrinterChange();
+    } else if (type === 'pla') {
+      document.getElementById('filamentCostKg').value = 20.00;
+      document.getElementById('material').value = 'PLA';
+      calculate();
+    } else if (type === 'petg') {
+      document.getElementById('filamentCostKg').value = 25.00;
+      document.getElementById('material').value = 'PETG';
+      calculate();
+    }
+  }
+
+  function calculate() {
+    // 1. 3D SLICER PARAMETER
+    const printerVal = document.getElementById("printerSelect").value;
     const nozzleType = document.getElementById("nozzleType").value;
     const buildPlate = document.getElementById("buildPlate").value;
+    const eleFootToggle = document.getElementById("eleFootToggle").value;
     const brand = document.getElementById("brand").value;
     const material = document.getElementById("material").value;
     const suppMat = document.getElementById("supportMaterial").value;
@@ -433,19 +726,14 @@ function updateSettings() {
     const mat = matDatabase[material];
     const br = brandOffsets[brand];
 
-    // High-Flow & Nozzle Berechnungen
     let flowVolBoost = 1.0;
     let tempNozzleAdd = 0;
     let speedMult = 1.0;
 
     if (nozzleType === "highflow_04") {
-        flowVolBoost = 1.50; // +50% Volumenfluss bei High-Flow CHT/ObXidian
-        tempNozzleAdd = 5;    // +5°C um Durchfluss flüssig zu halten
-        speedMult = 1.35;
+      flowVolBoost = 1.50; tempNozzleAdd = 5; speedMult = 1.35;
     } else if (nozzleType === "highflow_06") {
-        flowVolBoost = 1.90; // +90% Volumenfluss bei 0.6mm High-Flow
-        tempNozzleAdd = 8;
-        speedMult = 1.50;
+      flowVolBoost = 1.90; tempNozzleAdd = 8; speedMult = 1.50;
     }
 
     const calcVolumetric = (mat.vol * flowVolBoost).toFixed(1);
@@ -455,194 +743,215 @@ function updateSettings() {
 
     document.getElementById("nozzleTemp").innerText = minNozz + "°C - " + maxNozz + "°C";
     document.getElementById("bedTemp").innerText = mat.bed[0] + "°C - " + mat.bed[1] + "°C";
-    document.getElementById("fanSpeed").innerText = mat.fan;
     document.getElementById("flowRatio").innerText = calcFlow;
-    document.getElementById("maxVolumetric").innerText = calcVolumetric + " mm³/s (" + (nozzleType.includes("highflow") ? "High-Flow Boost" : "Standard") + ")";
-    document.getElementById("materialComparisonNote").innerText = mat.guide;
+    document.getElementById("maxVolumetric").innerText = calcVolumetric + " mm³/s";
 
     // Hardware Alert
     const hwAlert = document.getElementById("hardwareAlert");
     if (mat.hardNozzle && nozzleType === "standard_04") {
-        hwAlert.style.display = "block";
-        hwAlert.innerHTML = "⚠️ <strong>Achtung:</strong> Für " + material + " benötigst du eine <strong>gehärtete Düse (Hardened Steel)</strong>!";
+      hwAlert.style.display = "block";
+      hwAlert.innerHTML = "⚠️ <strong>Achtung:</strong> Für " + material + " benötigst du eine <strong>gehärtete Düse (Hardened Steel)</strong>!";
     } else {
-        hwAlert.style.display = "none";
+      hwAlert.style.display = "none";
     }
 
-    // Gehäuse
+    // Gehäuse Tip
     if (material.includes("ABS") || material.includes("ASA") || material.includes("PA")) {
-        document.getElementById("chamberTip").innerText = printer === "P1P" ? "Gehäuse nachrüsten!" : "Geschlossen (Vorheizen)";
+      document.getElementById("chamberTip").innerText = printerVal === "p1p" || printerVal === "a1m" ? "Gehäuse nachrüsten!" : "Geschlossen (Vorheizen)";
     } else if (material.includes("PLA")) {
-        document.getElementById("chamberTip").innerText = printer === "P1P" ? "Offen" : "Tür/Deckel ankippen";
+      document.getElementById("chamberTip").innerText = printerVal === "p1p" || printerVal === "a1m" ? "Offen" : "Tür/Deckel ankippen";
     } else {
-        document.getElementById("chamberTip").innerText = "Geschlossen";
+      document.getElementById("chamberTip").innerText = "Geschlossen";
     }
 
-    // DRUCKPLATTEN & 1. SCHICHT OPTIMIERUNG
-    let bedTempFinal = mat.bed[0];
+    // Elefantenfuß & Druckplatte
     let flWidth = "0.50 mm";
-    let flFlowCalc = (calcFlow * 1.03).toFixed(2);
-    let eleComp = "0.15 mm";
-    let plateName = "Smooth PEI";
-
+    let eleCompVal = "0.00 mm (Deaktiviert)";
+    if (eleFootToggle === "on") {
+      eleCompVal = buildPlate === "holo" ? "0.08 mm" : "0.15 mm";
+    }
     if (buildPlate === "holo") {
-        plateName = "Holo / PEO / PED (Effekt-Platte)";
-        bedTempFinal = mat.bed[0] + 5;
-        flWidth = "0.52 mm (Presst voll in die Hologramm-Struktur)";
-        flFlowCalc = (calcFlow * 1.05).toFixed(2) + " (+5% Extra-Druck für Spiegeleffekt)";
-        eleComp = "0.08 mm (Minimiert Wulst für flachen Effekt)";
-    } else if (buildPlate === "textured_pei") {
-        plateName = "Textured PEI (Rau)";
-        bedTempFinal = mat.bed[0] + 5;
-        flWidth = "0.50 mm";
-        flFlowCalc = (calcFlow * 1.04).toFixed(2);
-        eleComp = "0.15 mm";
-    } else if (buildPlate === "cool_plate") {
-        plateName = "Cool Plate (Bambu)";
-        bedTempFinal = 35;
-        flWidth = "0.45 mm";
-        flFlowCalc = calcFlow;
-        eleComp = "0.15 mm";
-    } else {
-        plateName = "Smooth PEI / High Temp";
-        bedTempFinal = mat.bed[0];
-        flWidth = "0.50 mm";
-        flFlowCalc = (calcFlow * 1.03).toFixed(2);
-        eleComp = "0.15 mm";
+      flWidth = "0.52 mm (Presst voll in Struktur)";
     }
 
-    document.getElementById("plateDisplay").innerText = plateName;
     document.getElementById("flLineWidth").innerText = flWidth;
-    document.getElementById("flSpeed").innerText = material === "TPU" ? "20 mm/s" : "30 mm/s (Langsam für Haftung)";
-    document.getElementById("flFlow").innerText = flFlowCalc;
-    document.getElementById("eleFootComp").innerText = eleComp;
-    document.getElementById("flBedTemp").innerText = bedTempFinal + "°C";
+    document.getElementById("eleFootComp").innerText = eleCompVal;
 
-    // SUPPORT LOGIK
+    // Support Logik
     const supportCard = document.getElementById("supportCard");
-    let zDist = mat.defaultZ;
-    let bZDist = mat.defaultZ;
-    let interLayers = "3 Schichten";
-    let interPattern = "Concentric";
-    let interSpacing = "0.20 mm";
-    let extText = "T1 (Gleicher Kopf)";
-    let suppType = "Tree (Slim / Auto)";
     let suppNote = "";
-
     if (suppMat === "none") {
-        supportCard.classList.add("disabled-card");
-        suppType = "Aus (Kein Support)";
-        extText = "Keiner";
-        zDist = "-";
-        bZDist = "-";
-        interLayers = "-";
-        interPattern = "-";
-        interSpacing = "-";
-        document.getElementById("supportXYDistance").innerText = "-";
-        suppNote = "Support ist deaktiviert. Achte darauf, dass das Modell keine Überhänge über 45° hat. ";
+      supportCard.classList.add("disabled-card");
+      document.getElementById("supportType").innerText = "Aus (Kein Support)";
+      document.getElementById("supportExtruder").innerText = "-";
+      document.getElementById("supportZDistance").innerText = "-";
+      document.getElementById("supportBottomZ").innerText = "-";
+      document.getElementById("supportInterface").innerText = "-";
+      document.getElementById("supportPattern").innerText = "-";
+      suppNote = "Support deaktiviert. Bedenke max. 45° Überhänge. ";
     } else {
-        supportCard.classList.remove("disabled-card");
-
-        if (printer === "H2D") {
-            extText = "T2 (2. Extruder-Düse)";
-        } else if (printer === "P1S") {
-            extText = "AMS Slot (Multimaterial)";
-        }
-
-        if (suppMat !== "same") {
-            zDist = "0.00 mm (Perfekte Unterseite!)";
-            bZDist = "0.00 mm";
-            interLayers = "3 - 4 Schichten";
-            interPattern = "Rectangular / Concentric";
-            interSpacing = "0.00 mm (Vollflächig)";
-            suppNote = "Spezial-Support / Trennschicht aktiv! Dank 0.00mm Z-Abstand wird die Unterseite spiegelglatt. ";
-        } else {
-            zDist = mat.defaultZ;
-            bZDist = mat.defaultZ;
-            interLayers = "2 Schichten";
-            interPattern = "Rectangular Grid";
-            interSpacing = "0.50 mm";
-            suppNote = "Monomaterial Support: Z-Abstand auf " + zDist + " gesetzt für einfaches Abbrechen. ";
-        }
-        document.getElementById("supportXYDistance").innerText = purpose === "detail" ? "0.40 mm" : "0.35 mm";
+      supportCard.classList.remove("disabled-card");
+      let zDist = suppMat !== "same" ? "0.00 mm (Glatt)" : mat.defaultZ;
+      document.getElementById("supportType").innerText = "Tree (Slim / Auto)";
+      document.getElementById("supportExtruder").innerText = suppMat === "same" ? "T1 (Haupt-Düse)" : "T2 / AMS";
+      document.getElementById("supportZDistance").innerText = zDist;
+      document.getElementById("supportBottomZ").innerText = zDist;
+      document.getElementById("supportInterface").innerText = suppMat !== "same" ? "3 - 4 Schichten" : "2 Schichten";
+      document.getElementById("supportPattern").innerText = "Concentric";
+      suppNote = suppMat !== "same" ? "Perfekte Unterseite dank 0.00mm Z-Abstand! " : "Monomaterial Support eingestellt. ";
     }
 
-    document.getElementById("supportType").innerText = suppType;
-    document.getElementById("supportZDistance").innerText = zDist;
-    document.getElementById("supportBottomZ").innerText = bZDist;
-    document.getElementById("supportInterface").innerText = interLayers;
-    document.getElementById("supportPattern").innerText = interPattern;
-    document.getElementById("supportSpacing").innerText = interSpacing;
-    document.getElementById("supportExtruder").innerText = suppMat === "same" ? "T1 (Haupt-Düse)" : extText;
+    // Geschwindigkeiten
+    let baseOuter = 120, baseInfill = 270;
+    if (purpose === "detail") { baseOuter = 70; baseInfill = 180; }
+    else if (purpose === "functional") { baseOuter = 110; baseInfill = 250; }
 
-    // ZWECK, GEOMETRIE & HIGH-FLOW GESCHWINDIGKEITEN
-    let baseOuter = 120;
-    let baseInner = 200;
-    let baseInfill = 270;
-    let baseTop = 100;
-
-    if (purpose === "functional") {
-        document.getElementById("wallLoops").innerText = "4 - 5 Linear";
-        document.getElementById("wallOrder").innerText = "Inner / Outer / Inner";
-        document.getElementById("topBottomLayers").innerText = "5 Top / 4 Bottom";
-        document.getElementById("infillDensity").innerText = "25% - 40%";
-        document.getElementById("infillPattern").innerText = "Wabenmuster / Hexagon";
-        document.getElementById("ironing").innerText = "Aus";
-        document.getElementById("layerHeight").innerText = "0.20 mm";
-        baseOuter = 110; baseInner = 200; baseInfill = 250; baseTop = 100;
-        suppNote += "Wabenmuster für höchste Torsionssteifigkeit.";
-    
-    } else if (purpose === "detail") {
-        document.getElementById("wallLoops").innerText = "3 Linien";
-        document.getElementById("wallOrder").innerText = "Outer / Inner (Präzise)";
-        document.getElementById("topBottomLayers").innerText = "6 Top / 5 Bottom";
-        document.getElementById("infillDensity").innerText = "12% - 15%";
-        document.getElementById("infillPattern").innerText = "Gyroid (Vibrationsarm)";
-        document.getElementById("ironing").innerText = "An (Top Surfaces)";
-        document.getElementById("layerHeight").innerText = "0.08 - 0.12 mm";
-        baseOuter = 70; baseInner = 120; baseInfill = 180; baseTop = 60;
-        suppNote += "Gyroid verhindert Resonanzstreifen & Ghosting. Falls benötigt, Tree-Support nutzen.";
-
-    } else if (purpose === "thinwall") {
-        document.getElementById("wallLoops").innerText = "2 - 3 Linien";
-        document.getElementById("wallOrder").innerText = "Inner / Outer";
-        document.getElementById("topBottomLayers").innerText = "4 Top / 4 Bottom";
-        document.getElementById("infillDensity").innerText = "100% (Solid)";
-        document.getElementById("infillPattern").innerText = "Monotonic Line";
-        document.getElementById("ironing").innerText = "Aus";
-        document.getElementById("layerHeight").innerText = "0.16 - 0.20 mm";
-        baseOuter = 100; baseInner = 160; baseInfill = 220; baseTop = 80;
-        suppNote += "Vollmaterial-Einstellung für dünne Wände ohne Schwingungen.";
-
-    } else {
-        document.getElementById("wallLoops").innerText = "3 Linien";
-        document.getElementById("wallOrder").innerText = "Inner / Outer";
-        document.getElementById("topBottomLayers").innerText = "5 Top / 4 Bottom";
-        document.getElementById("infillDensity").innerText = "15% - 20%";
-        document.getElementById("infillPattern").innerText = "Gyroid / Cross Hatch";
-        document.getElementById("ironing").innerText = "Aus / Auf Wunsch";
-        document.getElementById("layerHeight").innerText = "0.20 mm";
-        baseOuter = 140; baseInner = 230; baseInfill = 300; baseTop = 110;
-        suppNote += "Standard Allround-Preset.";
-    }
-
-    if (material === "TPU") {
-        document.getElementById("outerWallSpeed").innerText = "25 mm/s";
-        document.getElementById("innerWallSpeed").innerText = "35 mm/s";
-        document.getElementById("infillSpeed").innerText = "45 mm/s";
-        document.getElementById("topSpeed").innerText = "25 mm/s";
-    } else {
-        document.getElementById("outerWallSpeed").innerText = Math.round(baseOuter * speedMult) + " mm/s";
-        document.getElementById("innerWallSpeed").innerText = Math.round(baseInner * speedMult) + " mm/s";
-        document.getElementById("infillSpeed").innerText = Math.round(baseInfill * speedMult) + " mm/s";
-        document.getElementById("topSpeed").innerText = Math.round(baseTop * speedMult) + " mm/s";
-    }
-
-    document.getElementById("seamPos").innerText = purpose === "detail" ? "Möglichst verdeckt (Back)" : "Scharfe Ecke (Aligned)";
+    document.getElementById("outerWallSpeed").innerText = Math.round(baseOuter * speedMult) + " mm/s";
+    document.getElementById("infillSpeed").innerText = Math.round(baseInfill * speedMult) + " mm/s";
     document.getElementById("geometryNote").innerText = suppNote;
-}
 
-updateSettings();
+    // 2. EUFYMAKE E1 UV LOGIK
+    const enableUv = document.getElementById('enableUv').value === 'yes';
+    const uvControlsGroup = document.getElementById('uvControlsGroup');
+    const uvOutputCard = document.getElementById('uvOutputCard');
+
+    if (!enableUv) {
+      uvControlsGroup.classList.add('disabled-card');
+      uvOutputCard.classList.add('disabled-card');
+    } else {
+      uvControlsGroup.classList.remove('disabled-card');
+      uvOutputCard.classList.remove('disabled-card');
+    }
+
+    const uvSubstrate = document.getElementById("uvSubstrate").value;
+    const uvEffect = document.getElementById("uvEffect").value;
+    const uvWidth = parseFloat(document.getElementById("uvWidth").value) || 10;
+    const uvHeight = parseFloat(document.getElementById("uvHeight").value) || 15;
+
+    const areaCm2 = uvWidth * uvHeight;
+    let baseInkMl = areaCm2 * 0.0012;
+
+    let uvResText = "720x1440 dpi (High Quality)";
+    let uvPassText = "Bi-directional 16-Pass";
+    let uvWhiteText = "1x Base (100% Deckung)";
+    let uvLampText = "80% Intensity";
+    let uvPrimerText = "Nein";
+    let uvTipText = "";
+
+    let cmykPart = baseInkMl * 0.4;
+    let whiteGlossPart = baseInkMl * 0.6;
+
+    if (uvEffect === "white_double") {
+      whiteGlossPart *= 2.0;
+      uvWhiteText = "2x Weiß Unterdruck (Blickdicht)";
+    } else if (uvEffect === "emboss") {
+      whiteGlossPart *= 3.5;
+      uvWhiteText = "3x - 5x Weiß (3D-Relief Effekt)";
+      uvPassText = "Multi-Pass Relief Mode";
+    } else if (uvEffect === "gloss_finish") {
+      whiteGlossPart *= 1.5;
+      uvWhiteText = "1x Weiß + CMYK + Gloss Lack";
+    }
+
+    if (uvSubstrate === "acrylic") {
+      uvPrimerText = "Acryl-Primer empfohlen";
+      uvTipText = "Acryl mit Isopropanol entfetten. Für Glasklar-Optik 'Backlit-Druck' spiegelverkehrt nutzen.";
+    } else if (uvSubstrate === "metal") {
+      uvPrimerText = "Metall-Primer ZWINGEND";
+      uvLampText = "100% Intensity";
+      uvTipText = "Blankes Metall erfordert Spezial-Primer für maximale Kratzfestigkeit.";
+    } else if (uvSubstrate === "wood") {
+      uvPrimerText = "Nicht nötig";
+      uvTipText = "Holz saugt Tinte auf. Für brillante Farben unbedingt Weiß-Unterdruck nutzen.";
+    } else if (uvSubstrate === "mug") {
+      uvPassText = "Rotary Engine Mode (360°)";
+      uvPrimerText = "Keramik/Glas Primer";
+      uvTipText = "Rotary Attachment nutzen. Brennweite der UV-Lampe exakt einmessen.";
+    } else if (uvSubstrate === "print3d") {
+      uvPrimerText = "Nicht nötig";
+      uvTipText = "3D-Druckteile direkt bedrucken. Die Rillen füllen sich perfekt mit UV-Tinte.";
+    } else {
+      uvTipText = "16-Pass Modus sorgt für gleichmäßige Farbabdeckung.";
+    }
+
+    document.getElementById("uvRes").innerText = uvResText;
+    document.getElementById("uvPass").innerText = uvPassText;
+    document.getElementById("uvWhiteLayers").innerText = uvWhiteText;
+    document.getElementById("uvLampPower").innerText = uvLampText;
+    document.getElementById("uvPrimer").innerText = uvPrimerText;
+    document.getElementById("uvInkVolume").innerText = "~" + (cmykPart + whiteGlossPart).toFixed(2) + " ml (" + areaCm2 + " cm²)";
+    document.getElementById("uvNote").innerText = uvTipText;
+
+    // Auto-update Tintenverbrauch im Rechner
+    if (enableUv) {
+      document.getElementById("uvCmyk").value = cmykPart.toFixed(2);
+      document.getElementById("uvWhiteGloss").value = whiteGlossPart.toFixed(2);
+    }
+
+    // 3. KALKULATION DIREKT
+    const printHours = parseFloat(document.getElementById('printHours').value) || 0;
+    const filamentGrams = parseFloat(document.getElementById('filamentGrams').value) || 0;
+    const filamentCostKg = parseFloat(document.getElementById('filamentCostKg').value) || 0;
+    const powerWatts = parseFloat(document.getElementById('powerWatts').value) || 0;
+    const printerPrice = parseFloat(document.getElementById('printerPrice').value) || 0;
+    const printerLifespan = parseFloat(document.getElementById('printerLifespan').value) || 1;
+    const elecPrice = parseFloat(document.getElementById('elecPrice').value) || 0;
+
+    const costFilament = (filamentGrams / 1000) * filamentCostKg;
+    const costPower = (powerWatts / 1000) * printHours * elecPrice;
+    const costWear = (printerPrice / printerLifespan) * printHours;
+
+    const uvCmyk = parseFloat(document.getElementById('uvCmyk').value) || 0;
+    const uvWhiteGloss = parseFloat(document.getElementById('uvWhiteGloss').value) || 0;
+    const uvInkCostMl = parseFloat(document.getElementById('uvInkCostMl').value) || 0;
+    const blankCost = parseFloat(document.getElementById('blankCost').value) || 0;
+
+    let costUvInk = 0;
+    if (enableUv) {
+      costUvInk = (uvCmyk + uvWhiteGloss) * uvInkCostMl;
+    }
+    const costUvTotal = costUvInk + blankCost;
+
+    const laborMinutes = parseFloat(document.getElementById('laborMinutes').value) || 0;
+    const laborRate = parseFloat(document.getElementById('laborRate').value) || 0;
+    const costLabor = (laborMinutes / 60) * laborRate;
+
+    const totalCost = costFilament + costPower + costWear + costUvTotal + costLabor;
+
+    const marginPercent = parseFloat(document.getElementById('marginPercent').value) || 0;
+    const netSell = totalCost * (1 + marginPercent / 100);
+
+    const taxMode = document.getElementById("taxMode").value;
+    let vat = 0;
+    let grossSell = netSell;
+
+    if (taxMode === "regel") {
+      vat = netSell * 0.19;
+      grossSell = netSell + vat;
+      document.getElementById("vatPercentLabel").innerText = "19%";
+      document.getElementById("taxNote").innerText = "Preise verstehen sich inklusive 19% gesetzlicher Mehrwertsteuer.";
+    } else {
+      document.getElementById("vatPercentLabel").innerText = "0%";
+      document.getElementById("taxNote").innerText = "Gemäß § 19 UStG (Kleingewerberegelung) wird keine Umsatzsteuer ausgewiesen.";
+    }
+
+    const profit = netSell - totalCost;
+
+    document.getElementById('resFilament').innerText = costFilament.toFixed(2) + ' €';
+    document.getElementById('resPower').innerText = costPower.toFixed(2) + ' €';
+    document.getElementById('resWear').innerText = costWear.toFixed(2) + ' €';
+    document.getElementById('resUv').innerText = costUvTotal.toFixed(2) + ' €';
+    document.getElementById('resLabor').innerText = costLabor.toFixed(2) + ' €';
+    document.getElementById('resTotalCost').innerText = totalCost.toFixed(2) + ' €';
+
+    document.getElementById('resNetSell').innerText = netSell.toFixed(2) + ' €';
+    document.getElementById('resVat').innerText = vat.toFixed(2) + ' €';
+    document.getElementById('resGrossSell').innerText = grossSell.toFixed(2) + ' €';
+    document.getElementById('resProfit').innerText = profit.toFixed(2) + ' €';
+  }
+
+  // Initial ausführen
+  calculate();
 </script>
 
 </body>
